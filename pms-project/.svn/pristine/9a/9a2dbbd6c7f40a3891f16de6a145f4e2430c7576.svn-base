@@ -1,0 +1,95 @@
+package com.epro.pms.project_basic_info.controller;
+
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.epro.pms.project_basic_info.service.WorkWeeklyService;
+import com.epro.pms.util.po.Header;
+import com.epro.pms.util.po.Response;
+import com.epro.pms.util.po.RspConst;
+
+@Controller
+@RequestMapping("/weekly")
+public class WorkWeeklyController {
+	private static Log log = LogFactory.getLog(WorkWeeklyController.class);
+	@Autowired
+	private WorkWeeklyService workWeeklyService;
+	/**
+	 * 查询项目
+	 * @param paramMap
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getWorkWeekly.do", method = RequestMethod.POST)
+	public Map<String, Object> getWorkWeekly(@RequestBody Map<String, Object> paramMap){
+		Map<String, Object> header = (Map<String, Object>) paramMap.get("header");
+		Map<String, Object> request = (Map<String, Object>) paramMap.get("request");
+		
+		List<Map<String, Object>> weeklyloadReport = workWeeklyService.getProjectANDWeekloads(request);
+		
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put(RspConst.HEADER, new Header(RspConst.SUCCESS_CODE,RspConst.SUCCESS_MSG,1,1,1));
+		resMap.put(RspConst.RESPONSE,new Response("result", weeklyloadReport));		
+		
+		return resMap;
+	}
+	/**
+	 * 查询周报信息
+	 * @param paramMap
+	 * @return
+	 * @throws ParseException
+	 */
+	@ResponseBody
+	@RequestMapping(value="getPersonWork.do",method=RequestMethod.POST)
+	public Map<String,Object> getPersonWork(@RequestBody Map<String, Object> paramMap) throws ParseException{
+		Map<String, Object> header = (Map<String, Object>) paramMap.get("header");
+		Map<String, Object> request = (Map<String, Object>) paramMap.get("request");
+		
+		Map<String, Object> personPeriod = workWeeklyService.getPersonAndPeriod(request);
+		
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put(RspConst.RESPONSE,new Response("result", personPeriod));
+		return resMap;
+	}
+	/**
+	 * 增加周报
+	 * @param paramMap
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="saveWeekWorkloads.do",method=RequestMethod.POST)
+	public Map<String,Object> saveWeekWorkloads(@RequestBody Map<String, Object> paramMap){
+		Map<String, Object> header = (Map<String, Object>) paramMap.get("header");
+		Map<String, Object> request = (Map<String, Object>) paramMap.get("request");
+		List<Map<String,Object>> weekList = workWeeklyService.saveAllMessages(request);
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put(RspConst.RESPONSE,new Response("result", weekList));
+		return resMap;
+	}
+	/**
+	 * 根据项目ID和周期值 获取周期的工作量
+	 * @param paramMap
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="queryWorkloadByPeriod.do",method=RequestMethod.POST)
+	public Map<String,Object> queryWorkloadByPeriod(@RequestBody Map<String, Object> paramMap){
+		Map<String, Object> header = (Map<String, Object>) paramMap.get("header");
+		Map<String, Object> request = (Map<String, Object>) paramMap.get("request");
+		List<Map<String,Object>> workloadsList = workWeeklyService.getWeeksByPeriod(request);
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put(RspConst.RESPONSE,new Response("result", workloadsList));
+		return resMap;
+	}
+}

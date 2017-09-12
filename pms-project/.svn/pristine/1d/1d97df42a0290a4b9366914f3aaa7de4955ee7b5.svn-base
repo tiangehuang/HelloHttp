@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.epro.pms.project_basic_info.dao.WeeklyloadMapper">
+
+
+	<!--  -->
+	<insert id="insertWeeklyload" parameterType="java.util.HashMap">
+		INSERT INTO weekly_report(
+			PROJECT_ID,			PROJECT_NAME,		PO_NO,
+			PROJ_TEAM_NAME,		START_TIME,			END_TIME,
+			PERIOD,				W_ALL_WORKLOAD
+		) VALUES(
+			#{projectId},		#{projectName},		#{poNo},
+			#{projTeamName},	#{startTime},		#{endTime},
+			#{period},			#{wAllWorkload}
+		)
+	</insert>
+	
+	<update id="updateWeeklyloadById" parameterType="java.util.HashMap">
+		UPDATE weekly_report
+		<set>
+			<if test="projectId != null">
+				PROJECT_ID = #{projectId},
+			</if>
+			<if test="projectName != null">
+				PROJECT_NAME = #{projectName},
+			</if>
+			<if test="poNo != null">
+				PO_NO = #{poNo},
+			</if>
+			<if test="projTeamName != null">
+				PROJ_TEAM_NAME = #{projTeamName},
+			</if>
+			<if test="startTime != null">
+				START_TIME = #{startTime},
+			</if>
+			<if test="endTime != null">
+				END_TIME = #{endTime},
+			</if>
+			<if test="period != null">
+				PERIOD = #{period},
+			</if>
+			<if test="wAllWorkload != null">
+				W_ALL_WORKLOAD = #{wAllWorkload},
+			</if>
+		</set>
+		WHERE ID = #{id}
+	</update>
+	
+	<!-- 获取每个项目的所有第一周周报信息 -->
+	<select id="getWeeklyloads" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+		SELECT 
+			 ID				AS id,
+			 PROJECT_ID		AS projectId,
+			 PROJECT_NAME	AS projectName,
+			 PO_NO			AS poNo,
+			 PROJ_TEAM_NAME	AS projTeamName,
+			 START_TIME		AS startTime,
+			 END_TIME		AS endTime,
+			 PERIOD			AS period,
+			 W_ALL_WORKLOAD	AS wAllWorkload
+		FROM 
+			weekly_report
+		WHERE 1 = 1
+			<if test="projectName != null and projectName != ''">
+				AND PROJECT_NAME LIKE '%' #{projectName} '%'
+			</if>
+			<if test="period != null">
+				AND PERIOD = #{period}
+			</if>
+		ORDER BY
+			PROJECT_ID, ID
+	</select>
+	
+	<!-- 通过项目id和周期获取项目周报信息 -->
+	<select id="getWeeklyloadByProjectIdOrPeriod" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT 
+			 ID				AS id,
+			 PROJECT_ID		AS projectId,
+			 PROJECT_NAME	AS projectName,
+			 PO_NO			AS poNo,
+			 PROJ_TEAM_NAME	AS projTeamName,
+			 START_TIME		AS startTime,
+			 END_TIME		AS endTime,
+			 PERIOD			AS period,
+			 W_ALL_WORKLOAD	AS wAllWorkload
+		FROM 
+			weekly_report
+		WHERE 1 = 1
+			<if test="projectId != null">
+				AND PROJECT_ID = #{projectId} 
+			</if>
+			<if test="period != null">
+				AND PERIOD = #{period}
+			</if>
+	</select>
+	
+	<!-- 批量插入人员周报信息 -->
+	<insert id="insertTimesheet" parameterType="java.util.List">
+		INSERT INTO proj_timesheet(
+			PROJECT_ID,			PROJ_TEAM_NAME,			PERIOD,
+			EPRO_NO,			NAME,					W_START_TIME, 
+			W_END_TIME, 		WEEK_WORKLOAD,			W_CAPACITY,
+			LEAVE_TIME, 		REMARK
+		) VALUES 
+		<foreach collection="list" item="item" separator=",">
+		(
+			#{item.projectId},	#{item.projTeamName},	#{item.period},
+			#{item.eproNo},		#{item.name},			#{item.wStartTime},
+			#{item.wEndTime},	#{item.weekWorkload},	#{item.wCapacity},
+			#{item.leaveTime},	#{item.remark}
+		)
+		</foreach>
+	</insert>
+	<!-- 修改周报信息 -->
+	<update id="updateTimesheetById" parameterType="java.util.Map">
+		UPDATE 
+			proj_timesheet
+		<set>
+			<if test="wEndTime != null">
+				W_END_TIME = #{wEndTime},
+			</if>
+			<if test="wCapacity != null">
+				W_CAPACITY = #{wCapacity},
+			</if>
+			<if test="weekWorkload != null">
+				WEEK_WORKLOAD = #{weekWorkload},
+			</if>
+			<if test="leaveTime != null">
+				LEAVE_TIME = #{leaveTime},
+			</if>
+			<if test="remark != null">
+				REMARK = #{remark},
+			</if>
+		</set>
+		WHERE 
+			T_ID = #{tId}
+	</update>
+	
+	<select id="getTimesheetsByProjectIdOrPeriod" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT
+			T_ID			AS tid,
+			PROJECT_ID		AS projectId,
+			PROJ_TEAM_NAME	AS projTeamName,
+			PERIOD			AS period,
+			EPRO_NO			AS eproNo,
+			NAME			AS name,
+			W_START_TIME	AS wStartTime,
+			W_END_TIME		AS wEndTime,
+			WEEK_WORKLOAD	AS weekWorkload,
+			W_CAPACITY		AS wCapacity,
+			LEAVE_TIME		AS leaveTime,
+			REMARK			AS remark
+		FROM 
+			proj_timesheet
+		WHERE 1 = 1
+			<if test="period != null">
+				AND PERIOD = #{period} 
+			</if>
+			<if test="projectId != null">
+				AND PROJECT_ID = #{projectId}
+			</if>
+	</select>
+	
+	<select id="getTimesheetsByProjectIdAndEproNo" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			T_ID			AS tid,
+			PROJECT_ID		AS projectId,
+			PROJ_TEAM_NAME	AS projTeamName,
+			PERIOD			AS period,
+			EPRO_NO			AS eproNo,
+			`NAME`			AS 'name',
+			W_START_TIME	AS wStartTime,
+			W_END_TIME		AS wEndTime,
+			WEEK_WORKLOAD	AS weekWorkload,
+			W_CAPACITY		AS wCapacity,
+			LEAVE_TIME		AS leaveTime,
+			REMARK			AS remark
+		FROM 
+			proj_timesheet
+		WHERE 1 = 1 
+		<if test="eproNo != null">
+			AND EPRO_NO = #{eproNo} 
+		</if>
+		<if test="projectId != null">
+			AND PROJECT_ID = #{projectId}
+		</if>
+	</select>
+	
+	
+	<select id="getContractInfo" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT 
+			PROJ_TEAM_NAME	AS projTeamName,
+			PO_NO			AS poNo,
+			PROJ_NAME		AS projectName,
+			P_START_TIME	AS pStartTime,
+			P_END_TIME		AS pEndTime
+		FROM 
+			proj_contract
+		WHERE
+			CONTRACT_ID = #{contractId}
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+

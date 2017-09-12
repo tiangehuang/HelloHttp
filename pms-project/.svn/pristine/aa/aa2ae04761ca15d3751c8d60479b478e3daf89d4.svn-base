@@ -1,0 +1,744 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.epro.pms.project_basic_info.dao.ProjectBasicInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.epro.pms.project_basic_info.po.ProjectBasicInfo" >
+    <id column="PROJECT_ID" property="projectId" jdbcType="INTEGER" />
+    <result column="CONTRACT_ID" property="contractId" jdbcType="INTEGER" />
+    <result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR" />
+    <result column="CURR_B_MODEL" property="currBModel" jdbcType="INTEGER" />
+    <result column="PLAN_B_MODEL" property="planBModel" jdbcType="INTEGER" />
+    <result column="DEV_OR_CUSTOM" property="devOrCustom" jdbcType="INTEGER" />
+    <result column="PROJECT_FLOW" property="projectFlow" jdbcType="INTEGER" />
+    <result column="CURR_PROJECT_TYPE" property="currProjectType" jdbcType="INTEGER" />
+    <result column="PLAN_PROJECT_TYPE" property="planProjectType" jdbcType="INTEGER" />
+    <result column="FINISH_TIME" property="finishTime" jdbcType="DATE" />
+    <result column="CODE_TYPE" property="codeType" jdbcType="INTEGER" />
+    <result column="PROJECT_TYPE" property="projectType" jdbcType="INTEGER" />
+    <result column="PRODUCT_LINE" property="productLine" jdbcType="VARCHAR" />
+    <result column="PRODUCT" property="product" jdbcType="VARCHAR" />
+    <result column="AREA" property="area" jdbcType="VARCHAR" />
+    <result column="EPM_NAME" property="ePmName" jdbcType="VARCHAR" />
+    <result column="EPM_NO" property="ePmNo" jdbcType="VARCHAR" />
+    <result column="EQA_NAME" property="eQaName" jdbcType="VARCHAR" />
+    <result column="EQA_NO" property="eQaNo" jdbcType="VARCHAR" />
+    <result column="ECMO_NAME" property="eCmoName" jdbcType="VARCHAR" />
+    <result column="ECMO_NO" property="eCmoNo" jdbcType="VARCHAR" />
+    <result column="EMC_NAME" property="eMcName" jdbcType="VARCHAR" />
+    <result column="EMC_NO" property="eMcNo" jdbcType="VARCHAR" />
+    <result column="ECIE_NAME" property="eCieName" jdbcType="VARCHAR" />
+    <result column="ECIE_NO" property="eCieNo" jdbcType="VARCHAR" />
+    <result column="ETC_NAME" property="eTcName" jdbcType="VARCHAR" />
+    <result column="ETC_NO" property="eTcNo" jdbcType="VARCHAR" />
+    <result column="HPM_NAME" property="hPmName" jdbcType="VARCHAR" />
+    <result column="HPM_NO" property="hPmNo" jdbcType="VARCHAR" />
+    <result column="HQA_NAME" property="hQaName" jdbcType="VARCHAR" />
+    <result column="HQA_NO" property="hQaNo" jdbcType="VARCHAR" />
+    <result column="HCMO_NAME" property="hCmoName" jdbcType="VARCHAR" />
+    <result column="HCMO_NO" property="hCmoNo" jdbcType="VARCHAR" />
+    <result column="QA_MONITOR_LEVEL" property="qaMonitorLevel" jdbcType="VARCHAR" />
+    <result column="PROJ_HEALTH_LEVEL" property="projHealthLevel" jdbcType="VARCHAR" />
+    <result column="IS_TOP_PROJECT" property="isTopProject" jdbcType="INTEGER" />
+    <result column="IS_QUALIY_REPORT" property="isQualiyReport" jdbcType="INTEGER" />
+    <result column="MDE_COUNT" property="mdeCount" jdbcType="INTEGER" />
+    <result column="PL_COUNT" property="plCount" jdbcType="VARCHAR" />
+    <result column="TC_COUNT" property="tcCount" jdbcType="INTEGER" />
+    <result column="CODER_COUNT" property="coderCount" jdbcType="VARCHAR" />
+    <result column="TESTER_COUNT" property="testerCount" jdbcType="INTEGER" />
+    <result column="SKELETON_COUNT" property="skeletonCount" jdbcType="INTEGER" />
+    <result column="FIRST_HW_COUNT" property="firstHwCount" jdbcType="INTEGER" />
+    <result column="END_HW_COUNT" property="endHwCount" jdbcType="INTEGER" />
+    <result column="COUNT" property="count" jdbcType="INTEGER" />
+    <result column="OFFSITE_COUNT" property="offsiteCount" jdbcType="INTEGER" />
+    <result column="ONSITE_COUNT" property="onsiteCount" jdbcType="INTEGER" />
+    <result column="OFFSITE_AREA" property="offsiteArea" jdbcType="VARCHAR" />
+    <result column="ONSITE_AREA" property="onsiteArea" jdbcType="VARCHAR" />
+    <result column="PROJECT_STATE" property="projectState" jdbcType="VARCHAR" />
+    <result column="PERSONNEL_STATE" property="personnelState" jdbcType="VARCHAR" />
+    <result column="PROJECT_MANAGER" property="projectManager" jdbcType="VARCHAR"/>
+    <result column="PROJECT_MANAGER_NO" property="projectManagerNo" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  <select id="getProjectBasicInfoByPK" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    SELECT 
+    	*
+    FROM proj_basic_info
+    WHERE PROJECT_ID = #{projectId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 查询全部项目信息 -->
+  <select id="getProjectBasicInfo" resultType="java.util.Map" parameterType="java.util.Map">
+  	SELECT 
+  		p.PROJECT_ID		AS projectId,
+  		p.PROJECT_NAME		AS projectName,
+  		p.PRODUCT_LINE		AS productLine,
+  		p.PRODUCT			AS product,
+  		p.AREA				AS area,
+  		p.CURR_B_MODEL		AS currBModel,
+  		p.PLAN_B_MODEL		AS planBModel,
+  		p.CURR_PROJECT_TYPE	AS currProjectType,
+  		p.PLAN_PROJECT_TYPE	AS planProjectType,
+  		p.PROJ_HEALTH_LEVEL	AS projHealthLevel,
+  		p.PROJECT_STATE		AS projectState,
+  		s.CURR_STAGE		AS currStage,
+  		c.PROJ_STATE        AS projState
+  	FROM 
+  		proj_basic_info p
+  	LEFT JOIN 
+  		proj_state s ON p.PROJECT_ID = s.PROJECT_ID
+  	LEFT JOIN
+  		PROJ_CONTRACT c ON p.CONTRACT_ID = c.CONTRACT_ID
+  	WHERE 1 = 1
+  	<if test="ePmName != null and ePmName !=''">
+		AND p.EPM_NAME = #{ePmName}
+	</if>
+	<if test="eQaName != null and eQaName !=''">
+		AND p.EQA_NAME = #{eQaName}
+	</if>
+  	<if test="status != null and status !=''">
+	  	AND p.STATUS = #{status} 
+  	</if>
+  	<if test="area != null and area != ''">
+  		AND p.AREA = #{area}
+  	</if>
+  	<if test="productLine != null and productLine != ''">
+  		AND p.PRODUCT_LINE = #{productLine}
+  	</if>
+  	<if test="projectName != null and projectName != ''">
+  		AND p.PROJECT_NAME LIKE '%' #{projectName} '%'
+  	</if>
+  	<if test="contractId != null">
+  		AND p.CONTRACT_ID = #{contractId}
+  	</if>
+  	ORDER BY
+  		p.PROJECT_ID DESC
+  	<if test="pageRecord != null and pageRecord != ''">
+  		LIMIT #{beginnum}, #{pageRecord}
+  	</if>
+  </select>
+  
+  <select id="getProjectState" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+  	SELECT 
+  		p.PROJECT_ID		AS projectId,
+  		p.PROJECT_NAME		AS projectName,
+  		PLAN_WORK			AS plan,
+  		CURR_WORK			AS currWork,
+  		CURR_STAGE			AS currStage,
+  		QUALIY_DESC			AS qualiyDesc,
+  		SCHEDULE			AS schedule,
+  		FRS_QUALIY			AS frsQualiy,
+  		CODE_QUALIY			AS codeQualiy,
+  		CONTINU_INTEGRATION AS continuIntegration,
+  		COMMIT_TEST_QUALIY	AS commitTestQualiy,
+  		TEST_QUALIY			AS testQualiy,
+  		PROJECT_ABILITY		AS projectAbility,
+  		PROCESS_EVALUATE	AS processEvaluate,
+  		QA_WARN_COUNT		AS qaWarnCount,
+  		QUALIY_ASSESS		AS qualiyAssess
+  	FROM proj_basic_info p
+  	INNER JOIN proj_state s  ON p.PROJECT_ID = s.PROJECT_ID
+  	WHERE 1 = 1
+  	<if test="projectManager != null and projectManager !=''">
+			AND PROJECT_MANAGER = #{projectManager}
+	</if>
+	<if test="projectManagerNo != null">
+		AND PROJECT_MANAGER_NO = #{projectManagerNo}
+	</if> 
+  	<if test="status != null and status !=''">
+	  	AND p.STATUS = #{status} 
+  	</if>
+  	<if test="area != null and area != ''">
+  		AND p.AREA = #{area}
+  	</if>
+  	<if test="productLine != null and productLine != ''">
+  		AND p.PRODUCT_LINE = #{productLine}
+  	</if>
+  	<if test="projectName != null and projectName != ''">
+  		AND p.PROJECT_NAME LIKE '%' #{projectName} '%'
+  	</if>
+  	<if test="contractId != null">
+  		AND p.CONTRACT_ID = #{contractId}
+  	</if>
+  	ORDER BY
+  		p.PROJECT_ID DESC
+  	<if test="pageRecord != null and pageRecord != ''">
+  	LIMIT #{beginnum}, #{pageRecord}
+  	</if>
+  </select>
+  
+  <delete id="deleteProjectBasicInfoByPK" parameterType="java.lang.Integer" >
+    DELETE FROM proj_basic_info
+    WHERE PROJECT_ID = #{projectId,jdbcType=INTEGER}
+  </delete>
+  <update id="softDelProjectByPK" parameterType="java.lang.Integer">
+  	UPDATE proj_basic_info
+  	SET STATUS = 0
+  	WHERE PROJECT_ID = #{projectId}
+  </update>
+  
+  <insert id="insert" parameterType="com.epro.pms.project_basic_info.po.ProjectBasicInfo" >
+    INSERT INTO proj_basic_info 
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+    	<if test="projectId != null and projectId !=''">
+    		PROJECT_ID,
+    	</if>
+    	<if test="contractId != null and contractId !=''">
+    		CONTRACT_ID,
+    	</if>
+    	<if test="projectName != null and projectName !=''">
+    		PROJECT_NAME,
+    	</if>
+    	<if test="currBModel != null and currBModel !=''">
+    		CURR_B_MODEL, 
+    	</if>
+    	<if test="planBModel != null and planBModel !=''">
+    		PLAN_B_MODEL,
+    	</if>
+    	<if test="devOrCustom != null and devOrCustom !=''">
+    		DEV_OR_CUSTOM,
+    	</if>
+    	<if test="projectFlow != null and projectFlow !=''">
+    		PROJECT_FLOW,
+    	</if>
+    	<if test="currProjectType != null and currProjectType !=''">
+    		CURR_PROJECT_TYPE, 
+    	</if>
+    	<if test="planProjectType != null and planProjectType !=''">
+    		PLAN_PROJECT_TYPE,
+    	</if>
+    	<if test="finishTime != null">
+    		FINISH_TIME,
+    	</if>
+    	<if test="codeType != null and codeType !=''">
+    		CODE_TYPE, 
+    	</if>
+    	<if test="projectType != null and projectType !=''">
+    		PROJECT_TYPE, 
+    	</if>
+    	<if test="productLine != null and productLine !=''">
+    		PRODUCT_LINE,
+    	</if>
+    	<if test="product != null and product !=''">
+    		PRODUCT,
+    	</if>
+    	<if test="area != null and area !=''">
+    		AREA, 
+    	</if>
+    	<if test="ePmName != null and ePmName !=''">
+    		EPM_NAME, 
+    	</if>
+    	<if test="ePmNo != null and ePmNo !=''">
+    		EPM_NO,
+    	</if>
+    	<if test="eQaName != null and eQaName !=''">
+    		EQA_NAME,
+    	</if>
+    	<if test="eQaNo != null and eQaNo !=''">
+    		EQA_NO,
+    	</if>
+    	<if test="eCmoName != null and eCmoName !=''">
+    		ECMO_NAME, 
+    	</if>
+    	<if test="eCmoNo != null and eCmoNo !=''">
+    		ECMO_NO,
+    	</if>
+    	<if test="eMcName != null and eMcName !=''">
+    		EMC_NAME,
+    	</if>
+    	<if test="eMcNo != null and eMcNo !=''">
+    		EMC_NO,
+    	</if>
+    	<if test="eCieName != null and eCieName !=''">
+    		ECIE_NAME, 
+    	</if>
+    	<if test="eCieNo != null and eCieNo !=''">
+    		ECIE_NO,
+    	</if>
+    	<if test="eTcName != null and eTcName !=''">
+    		ETC_NAME,
+    	</if>
+    	<if test="eTcNo != null and eTcNo !=''">
+    		ETC_NO,
+    	</if>
+    	<if test="hPmName != null and hPmName !=''">
+    		HPM_NAME, 
+    	</if>
+    	<if test="hPmNo != null and hPmNo !=''">
+    		HPM_NO,
+    	</if>
+    	<if test="hQaName != null and hQaName !=''">
+    		HQA_NAME,
+    	</if>
+    	<if test="hQaNo != null and hQaNo !=''">
+    		HQA_NO,
+    	</if>
+    	<if test="hCmoName != null and hCmoName !=''">
+    		HCMO_NAME, 
+    	</if>
+    	<if test="hCmoNo != null and hCmoNo !=''">
+    		HCMO_NO,
+    	</if>
+    	<if test="qaMonitorLevel != null and qaMonitorLevel !=''">
+    		QA_MONITOR_LEVEL,
+    	</if>
+    	<if test="projHealthLevel != null and projHealthLevel !=''">
+    		PROJ_HEALTH_LEVEL,
+    	</if>
+    	<if test="isTopProject != null and isTopProject !=''">
+    		IS_TOP_PROJECT, 
+    	</if>
+    	<if test="isQualiyReport != null and isQualiyReport !=''">
+    		IS_QUALIY_REPORT,
+    	</if>
+    	<if test="mdeCount != null and mdeCount !=''">
+    		MDE_COUNT,
+    	</if>
+    	<if test="plCount != null and plCount !=''">
+    		PL_COUNT,
+    	</if>
+    	<if test="tcCount != null and tcCount !=''">
+    		TC_COUNT, 
+    	</if>
+    	<if test="coderCount != null and coderCount !=''">
+    		CODER_COUNT,
+    	</if>
+    	<if test="testerCount != null and testerCount !=''">
+    		TESTER_COUNT, 
+    	</if>
+    	<if test="skeletonCount != null and skeletonCount !=''">
+    		SKELETON_COUNT, 
+    	</if>
+    	<if test="firstHwCount != null and firstHwCount !=''">
+    		FIRST_HW_COUNT,
+    	</if>
+    	<if test="endHwCount != null and endHwCount !=''">
+    		END_HW_COUNT,
+    	</if>
+    	<if test="count != null and count !=''">
+    		COUNT,
+    	</if>
+    	<if test="offsiteCount != null and offsiteCount !=''">
+    		OFFSITE_COUNT, 
+    	</if>
+    	<if test="onsiteCount != null and onsiteCount !=''">
+    		ONSITE_COUNT,
+    	</if>
+    	<if test="offsiteArea != null and offsiteArea !=''">
+    		OFFSITE_AREA, 
+    	</if>
+    	<if test="onsiteArea != null and onsiteArea !=''">
+    		ONSITE_AREA, 
+    	</if>
+    	<if test="projectState != null and projectState !=''">
+    		PROJECT_STATE,
+    	</if>
+    	<if test="personnelState != null and personnelState !=''">
+    		PERSONNEL_STATE,
+    	</if>
+    </trim>
+    VALUES
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+    	<if test="projectId != null and projectId !=''">
+    		#{projectId,jdbcType=INTEGER},
+    	</if>
+    	<if test="contractId != null and contractId !=''">
+    		#{contractId,jdbcType=INTEGER},
+    	</if>
+    	<if test="projectName != null and projectName !=''">
+    		#{projectName,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="currBModel != null and currBModel !=''">
+    		#{currBModel,jdbcType=INTEGER}, 
+    	</if>
+    	<if test="planBModel != null and planBModel !=''">
+    		#{planBModel,jdbcType=INTEGER},
+    	</if>
+    	<if test="devOrCustom != null and devOrCustom !=''">
+    		#{devOrCustom,jdbcType=INTEGER},
+    	</if>
+    	<if test="projectFlow != null and projectFlow !=''">
+    		#{projectFlow,jdbcType=INTEGER},
+    	</if>
+    	<if test="currProjectType != null and currProjectType !=''">
+    		#{currProjectType,jdbcType=INTEGER}, 
+    	</if>
+    	<if test="planProjectType != null and planProjectType !=''">
+    		#{planProjectType,jdbcType=INTEGER},
+    	</if>
+    	<if test="finishTime != null">
+    		#{finishTime,jdbcType=DATE}, 
+    	</if>
+    	<if test="codeType != null and codeType !=''">
+    		#{codeType,jdbcType=INTEGER},
+    	</if>
+    	<if test="projectType != null and projectType !=''">
+    		#{projectType,jdbcType=INTEGER}, 
+    	</if>
+    	<if test="productLine != null and productLine !=''">
+    		#{productLine,jdbcType=VARCHAR},
+    	</if>
+    	<if test="product != null and product !=''">
+    		#{product,jdbcType=VARCHAR},
+    	</if>
+    	<if test="area != null and area !=''">
+    		#{area,jdbcType=VARCHAR},
+    	</if>
+    	<if test="ePmName != null and ePmName !=''">
+    		#{ePmName,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="ePmNo != null and ePmNo !=''">
+    		#{ePmNo,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="eQaName != null and eQaName !=''">
+    		#{eQaName,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="eQaNo != null and eQaNo !=''">
+    		#{eQaNo,jdbcType=VARCHAR},
+    	</if>
+    	<if test="eCmoName != null and eCmoName !=''">
+    		#{eCmoName,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="eCmoNo != null and eCmoNo !=''">
+    		#{eCmoNo,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="eMcName != null and eMcName !=''">
+    		#{eMcName,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="eMcNo != null and eMcNo !=''">
+    		#{eMcNo,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="eCieName != null and eCieName !=''">
+    		#{eCieName,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="eCieNo != null and eCieNo !=''">
+    		#{eCieNo,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="eTcName != null and eTcName !=''">
+    		#{eTcName,jdbcType=VARCHAR},
+    	</if>
+    	<if test="eTcNo != null and eTcNo !=''">
+    		#{eTcNo,jdbcType=VARCHAR},
+    	</if>
+    	<if test="hPmName != null and hPmName !=''">
+    		#{hPmName,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="hPmNo != null and hPmNo !=''">
+    		#{hPmNo,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="hQaName != null and hQaName !=''">
+    		#{hQaName,jdbcType=VARCHAR},
+    	</if>
+    	<if test="hQaNo != null and hQaNo !=''">
+    		#{hQaNo,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="hCmoName != null and hCmoName !=''">
+    		#{hCmoName,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="hCmoNo != null and hCmoNo !=''">
+    		#{hCmoNo,jdbcType=VARCHAR},
+    	</if>
+    	<if test="qaMonitorLevel != null and qaMonitorLevel !=''">
+    		#{qaMonitorLevel,jdbcType=VARCHAR},
+    	</if>
+    	<if test="projHealthLevel != null and projHealthLevel !=''">
+    		#{projHealthLevel,jdbcType=VARCHAR},
+    	</if>
+    	<if test="isTopProject != null and isTopProject !=''">
+    		#{isTopProject,jdbcType=INTEGER}, 
+    	</if>
+    	<if test="isQualiyReport != null and isQualiyReport !=''">
+    		#{isQualiyReport,jdbcType=INTEGER},
+    	</if>
+    	<if test="mdeCount != null and mdeCount !=''">
+    		#{mdeCount,jdbcType=INTEGER},
+    	</if>
+    	<if test="plCount != null and plCount !=''">
+    		#{plCount,jdbcType=INTEGER}, 
+    	</if>
+    	<if test="tcCount != null and tcCount !=''">
+    		#{tcCount,jdbcType=INTEGER},
+    	</if>
+    	<if test="coderCount != null and coderCount !=''">
+    		#{coderCount,jdbcType=INTEGER},
+    	</if>
+    	<if test="testerCount != null and testerCount !=''">
+    		#{testerCount,jdbcType=INTEGER},
+    	</if>
+    	<if test="skeletonCount != null and skeletonCount !=''">
+    		#{skeletonCount,jdbcType=INTEGER}, 
+    	</if>
+    	<if test="firstHwCount != null and firstHwCount !=''">
+    		#{firstHwCount,jdbcType=INTEGER},
+    	</if>
+    	<if test="endHwCount != null and endHwCount !=''">
+    		#{endHwCount,jdbcType=INTEGER}, 
+    	</if>
+    	<if test="count != null and count !=''">
+    		#{count,jdbcType=INTEGER}, 
+    	</if>
+    	<if test="offsiteCount != null and offsiteCount !=''">
+    		#{offsiteCount,jdbcType=INTEGER}, 
+    	</if>
+    	<if test="onsiteCount != null and onsiteCount !=''">
+    		#{onsiteCount,jdbcType=INTEGER},
+    	</if>
+    	<if test="offsiteArea != null and offsiteArea !=''">
+    		#{offsiteArea,jdbcType=VARCHAR},
+    	</if>
+    	<if test="onsiteArea != null and onsiteArea !=''">
+    		#{onsiteArea,jdbcType=VARCHAR},
+    	</if>
+    	<if test="projectState != null and projectState !=''">
+    		#{projectState,jdbcType=VARCHAR}, 
+    	</if>
+    	<if test="personnelState != null and personnelState !=''">
+    		#{personnelState,jdbcType=VARCHAR},
+    	</if>
+    	<if test="projectManager != null and projectManager != ''">
+    		#{projectManager, jdbcType=VARCHAR},
+    	</if>
+    	<if test="projectManagerNo != null and projectManagerNo != ''">
+    		#{projectManagerNo, jdbcType=VARCHAR},
+    	</if>
+    </trim>
+  </insert>
+  
+  <update id="updateProjectBasicInfoByPK" parameterType="java.util.HashMap" >
+    UPDATE proj_basic_info
+    <set >
+      <if test="contractId != null" >
+        CONTRACT_ID = #{contractId,jdbcType=INTEGER},
+      </if>
+      <if test="projectName != null" >
+        PROJECT_NAME = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="currBModel != null" >
+        CURR_B_MODEL = #{currBModel,jdbcType=INTEGER},
+      </if>
+      <if test="planBModel != null" >
+        PLAN_B_MODEL = #{planBModel,jdbcType=INTEGER},
+      </if>
+      <if test="devOrCustom != null" >
+        DEV_OR_CUSTOM = #{devOrCustom,jdbcType=INTEGER},
+      </if>
+      <if test="projectFlow != null" >
+        PROJECT_FLOW = #{projectFlow,jdbcType=INTEGER},
+      </if>
+      <if test="currProjectType != null" >
+        CURR_PROJECT_TYPE = #{currProjectType,jdbcType=INTEGER},
+      </if>
+      <if test="planProjectType != null" >
+        PLAN_PROJECT_TYPE = #{planProjectType,jdbcType=INTEGER},
+      </if>
+      <if test="finishTime != null" >
+        FINISH_TIME = #{finishTime,jdbcType=DATE},
+      </if>
+      <if test="codeType != null" >
+        CODE_TYPE = #{codeType,jdbcType=INTEGER},
+      </if>
+      <if test="projectType != null" >
+        PROJECT_TYPE = #{projectType,jdbcType=INTEGER},
+      </if>
+      <if test="productLine != null" >
+        PRODUCT_LINE = #{productLine,jdbcType=VARCHAR},
+      </if>
+      <if test="product != null" >
+        PRODUCT = #{product,jdbcType=VARCHAR},
+      </if>
+      <if test="area != null" >
+        AREA = #{area,jdbcType=VARCHAR},
+      </if>
+      <if test="ePmName != null" >
+        EPM_NAME = #{ePmName,jdbcType=VARCHAR},
+      </if>
+      <if test="ePmNo != null" >
+        EPM_NO = #{ePmNo,jdbcType=VARCHAR},
+      </if>
+      <if test="eQaName != null" >
+        EQA_NAME = #{eQaName,jdbcType=VARCHAR},
+      </if>
+      <if test="eQaNo != null" >
+        EQA_NO = #{eQaNo,jdbcType=VARCHAR},
+      </if>
+      <if test="eCmoName != null" >
+        ECMO_NAME = #{eCmoName,jdbcType=VARCHAR},
+      </if>
+      <if test="eCmoNo != null" >
+        ECMO_NO = #{eCmoNo,jdbcType=VARCHAR},
+      </if>
+      <if test="eMcName != null" >
+        EMC_NAME = #{eMcName,jdbcType=VARCHAR},
+      </if>
+      <if test="eMcNo != null" >
+        EMC_NO = #{eMcNo,jdbcType=VARCHAR},
+      </if>
+      <if test="eCieName != null" >
+        ECIE_NAME = #{eCieName,jdbcType=VARCHAR},
+      </if>
+      <if test="eCieNo != null" >
+        ECIE_NO = #{eCieNo,jdbcType=VARCHAR},
+      </if>
+      <if test="eTcName != null" >
+        ETC_NAME = #{eTcName,jdbcType=VARCHAR},
+      </if>
+      <if test="eTcNo != null" >
+        ETC_NO = #{eTcNo,jdbcType=VARCHAR},
+      </if>
+      <if test="hPmName != null" >
+        HPM_NAME = #{hPmName,jdbcType=VARCHAR},
+      </if>
+      <if test="hPmNo != null" >
+        HPM_NO = #{hPmNo,jdbcType=VARCHAR},
+      </if>
+      <if test="hQaName != null" >
+        HQA_NAME = #{hQaName,jdbcType=VARCHAR},
+      </if>
+      <if test="hQaNo != null" >
+        HQA_NO = #{hQaNo,jdbcType=VARCHAR},
+      </if>
+      <if test="hCmoName != null" >
+        HCMO_NAME = #{hCmoName,jdbcType=VARCHAR},
+      </if>
+      <if test="hCmoNo != null" >
+        HCMO_NO = #{hCmoNo,jdbcType=VARCHAR},
+      </if>
+      <if test="qaMonitorLevel != null" >
+        QA_MONITOR_LEVEL = #{qaMonitorLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="projHealthLevel != null" >
+        PROJ_HEALTH_LEVEL = #{projHealthLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="projectStatus != null" >
+        PROJECT_STATUS = #{projectStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="isTopProject != null" >
+        IS_TOP_PROJECT = #{isTopProject,jdbcType=INTEGER},
+      </if>
+      <if test="isQualiyReport != null" >
+        IS_QUALIY_REPORT = #{isQualiyReport,jdbcType=INTEGER},
+      </if>
+      <if test="mdeCount != null and mdeCount != ''">
+        MDE_COUNT = #{mdeCount,jdbcType=INTEGER},
+      </if>
+      <if test="plCount != null and plCount != ''">
+        PL_COUNT = #{plCount,jdbcType=INTEGER},
+      </if>
+      <if test="tcCount != null and tcCount != ''" >
+        TC_COUNT = #{tcCount,jdbcType=INTEGER},
+      </if>
+      <if test="coderCount != null and coderCount != ''">
+      	CODER_COUNT = #{coderCount, jdbcType=INTEGER},
+      </if>
+      <if test="testerCount != null and tester != ''" >
+        TESTER_COUNT = #{testerCount,jdbcType=INTEGER},
+      </if>
+      <if test="skeletonCount != null and skeletonCount != ''" >
+        SKELETON_COUNT = #{skeletonCount,jdbcType=INTEGER},
+      </if>
+      <if test="firstHwCount != null and firstHwCount != ''" >
+        FIRST_HW_COUNT = #{firstHwCount,jdbcType=INTEGER},
+      </if>
+      <if test="endHwCount != null and endHwCount != ''" >
+        END_HW_COUNT = #{endHwCount,jdbcType=INTEGER},
+      </if>
+      <if test="count != null and count != ''" >
+        COUNT = #{count,jdbcType=INTEGER},
+      </if>
+      <if test="offsiteCount != null and offsiteCount != ''" >
+        OFFSITE_COUNT = #{offsiteCount,jdbcType=INTEGER},
+      </if>
+      <if test="onsiteCount != null and onsiteCount != ''" >
+        ONSITE_COUNT = #{onsiteCount,jdbcType=INTEGER},
+      </if>
+      <if test="offsiteArea != null" >
+        OFFSITE_AREA = #{offsiteArea,jdbcType=VARCHAR},
+      </if>
+      <if test="onsiteArea != null" >
+        ONSITE_AREA = #{onsiteArea,jdbcType=VARCHAR},
+      </if>
+      <if test="projectState != null" >
+        PROJECT_STATE = #{projectState,jdbcType=VARCHAR},
+      </if>
+      <if test="personnelState != null" >
+        PERSONNEL_STATE = #{personnelState,jdbcType=VARCHAR},
+      </if>
+    </set>
+    WHERE PROJECT_ID = #{projectId,jdbcType=INTEGER}
+  </update>
+  
+  <!-- 详情基本信息 -->
+  <select id="getBasic" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+  		SELECT 
+  			p.PROJECT_NAME 		AS projectName,
+  			c.PROJ_TEAM_NAME	AS projTeamName,
+  			c.CONTRACT_ID 		AS contractId,
+  			p.DEV_OR_CUSTOM 	AS devOrCustom,
+  			p.PROJECT_FLOW 		AS projectFlow,
+  			p.PLAN_B_MODEL 		AS planBModel,
+  			p.CURR_B_MODEL 		AS currBModel,
+  			p.PLAN_PROJECT_TYPE AS planProjectType,
+  			p.CURR_PROJECT_TYPE AS currProjectType,
+  			p.CODE_TYPE 		AS codeType,
+  			p.PROJECT_TYPE 		AS projectType,
+  			p.PRODUCT_LINE 		AS productLine,
+  			p.PRODUCT 			AS product,
+  			p.AREA 				AS area,
+  			p.FINISH_TIME 		AS finishTime,
+  			p.COUNT				AS count,
+  			p.OFFSITE_COUNT		AS offsiteCount,
+  			P.ONSITE_COUNT		AS onsiteCount,
+  			p.EPM_NAME			AS ePmName
+  		FROM proj_basic_info p
+  		LEFT JOIN proj_contract c ON p.CONTRACT_ID = c.CONTRACT_ID
+  		WHERE 1 = 1
+  		<if test="projectId != null">
+  			AND p.PROJECT_ID = #{projectId}
+  		</if>
+  </select>
+  
+	<update id="updateContract" parameterType="java.util.HashMap">
+		update proj_contract 
+		<trim prefix="set" suffixOverrides=",">
+			<if test="contractState !=null">
+				CONTRACT_STATE = #{contractState},
+			</if>
+		</trim>
+		where CONTRACT_ID = #{contractId}
+	</update> 
+	
+	<select id="getContractByPK" resultType="java.util.HashMap" parameterType="java.lang.Integer">
+		SELECT 
+			PROJ_TEAM_NAME	AS projTeamName,
+			PROJ_WORKLOAD	AS projWorkload,
+			PROJ_TEAM_ID	AS projTeamId,
+			PO_NO			AS projectPO
+		FROM proj_contract
+		WHERE CONTRACT_ID = #{contractId}
+	</select>
+	
+	<!--  增加项目需要获取相关的合同信息，
+	 根据合同状态来获取没有关联项目的合同，取出相关的字段 --> 
+    <select id="getContract4project" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    	SELECT 
+    		CONTRACT_ID		AS contractId, 
+    		AREA			AS area,
+    		PROJ_NAME		AS projectName,
+    		PRODUCT_LINE	AS productLine,
+    		PRODUCT			AS product,
+    		PROJ_TEAM_NAME	AS projTeamName,
+    		PROJ_WORKLOAD	AS projWorkload,
+    		HW_PM			AS hwPm,
+    		EPRO_PM			AS eproPm,
+    		PROJ_TEAM_ID	AS projTeamId
+    	FROM proj_contract
+    	WHERE CONTRACT_STATE = 1
+    	<if test="contractId != null">
+    		AND CONTRACT_ID = #{contractId}
+    	</if>
+    	<if test="projectName != null">
+    		AND PROJ_NAME = #{projectName} 
+    	</if>
+    </select>
+	
+	
+  
+</mapper>

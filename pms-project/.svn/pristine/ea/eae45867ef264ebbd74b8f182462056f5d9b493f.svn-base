@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.epro.pms.project_basic_info.dao.WorkWeeklyMapper">
+	<!-- 获取项目数量 -->
+	<select id="getProjects" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT p.project_id  AS projectId,
+			p.project_name   AS projectName,
+			c.P_START_TIME   AS pStartTime,
+			c.P_END_TIME     AS pEndTime,
+			c.PROJ_TEAM_NAME AS projectTeamName,
+			c.po_no   		 AS poNo
+			FROM proj_basic_info p 
+			LEFT JOIN proj_contract c ON p.contract_id = c.contract_id where p.status=1 	
+			<if test="managerName != null and managerName != ''">
+				and p.CONTRACT_ID in(SELECT CONTRACT_ID FROM proj_contract WHERE DEPT_MANAGER = #{managerName} and AREA = #{managerArea})
+			</if>
+				<if test="epmName != null and epmName != ''">
+					and p.EPM_NAME = #{epmName}
+					and c.AREA = #{area}
+				</if>
+				<if test="managerArea != null and managerArea != ''">
+					and c.AREA = #{managerArea}
+				</if>
+				<if test="projectName == null or projectName == ''">
+					and c.PROJ_STATE != 4 
+				</if>
+				<if test="projectName != null and projectName != ''">
+					and p.project_name LIKE '%' #{projectName} '%'
+				</if>
+				<if test="projectId != null and projectId != ''">
+					and p.project_id = #{projectId}
+				</if> 
+	</select>
+	
+	<!-- 获取周报 -->
+	<select id="getProjectWeekloads" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT w.project_id  AS projectId,
+				w.project_name  AS projectName,
+				w.PROJ_TEAM_NAME AS projectTeamName,
+				p.T_ID AS tId,
+				w.PERIOD AS period,
+				p.EPRO_NO AS eproNo,
+				p.name AS name,
+				p.week_workload AS weekWorkload,
+				p.w_capacity AS  wCapcity,
+				p.remark as remark,
+				w.start_time AS startTime,
+				w.end_time AS endTime,
+				w.W_ALL_WORKLOAD AS wAllWorkload
+			FROM 
+				weekly_report w,proj_timesheet p 
+			WHERE w.PERIOD = p.PERIOD and w.project_id = p.project_id			
+				<if test="projectId != null and projectId != ''">
+					and w.project_id = #{projectId}
+				</if>
+				<if test="period !=null and period !=''">
+					and w.period = #{period}
+				</if> 
+	</select>
+	
+	<!-- 获取周报的周期数 -->
+	<select id="getProjectPeriod" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select w.project_id as projectId,
+				w.start_time AS startTime,
+				w.end_time AS endTime,
+				w.period as period
+				from weekly_report w
+			where w.project_id = #{projectId} 	
+	</select>
+	
+	<!-- 获取当前项目的人员 -->
+	<select id="getPersonByProjectId" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+		select p.employee_id as employeeId,p.person_name as personName from proj_person p where p.project_id=#{ProjectId} and p.is_leave = 0
+	</select>
+	
+	<!-- 添加项目周期及周汇总工作量 -->
+	<insert id="insertPeriod" parameterType="java.util.HashMap">
+		INSERT INTO weekly_report(
+			PROJECT_ID,			PROJECT_NAME,		PO_NO,
+			PROJ_TEAM_NAME,		START_TIME,			END_TIME,
+			PERIOD,				W_ALL_WORKLOAD
+		) VALUES(
+			#{projectId},		#{projectName},		#{projectNo},
+			#{projectTeamName},	#{startTime},		#{endTime},
+			#{period},			#{wAllWorkload}
+		)
+	</insert>
+	
+	<!-- 批量插入人员周报信息 -->
+	<insert id="insertTimesheet" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="tId">
+		INSERT INTO proj_timesheet(
+			PROJECT_ID,			PROJ_TEAM_NAME,			PERIOD,
+			EPRO_NO,			NAME,			 		WEEK_WORKLOAD,			
+			W_CAPACITY,  		REMARK
+		) VALUES 
+		<foreach collection="list" item="item" separator=",">
+		(
+			#{item.projectId},	#{item.projectTeamName},	#{item.period},
+			#{item.eproNo},		#{item.name},				#{item.weekWorkload},	
+			#{item.wCapacity}, 	#{item.remark}
+		)
+		</foreach>
+	</insert>
+	
+	<update id="updateTimesheetById" parameterType="java.util.Map">
+		UPDATE 
+			proj_timesheet
+		<set>
+			<if test="wEndTime != null">
+				W_END_TIME = #{wEndTime},
+			</if>
+			<if test="wCapacity != null">
+				W_CAPACITY = #{wCapacity},
+			</if>
+			<if test="weekWorkload != null">
+				WEEK_WORKLOAD = #{weekWorkload},
+			</if>
+			<if test="leaveTime != null">
+				LEAVE_TIME = #{leaveTime},
+			</if>
+			<if test="remark != null">
+				REMARK = #{remark},
+			</if>
+		</set>
+		WHERE 
+			T_ID = #{tId}
+	</update>
+	
+	<select id="getProjecNameByProjTeam" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT distinct
+			p.project_id  AS projectId,
+			p.project_name   AS projectName
+			FROM proj_basic_info p 
+			LEFT JOIN proj_contract c ON p.contract_id = c.contract_id where p.status=1 	
+				<if test="epmName != null and epmName != ''">
+					and p.EPM_NAME = #{epmName}
+					and c.AREA = #{area}
+				</if>
+				<if test="managerArea != null and managerArea != ''">
+					and c.AREA = #{managerArea}
+				</if>
+				<if test="projectTeamName != null or projectTeamName != ''">
+					and c.PROJ_TEAM_NAME = #{projectTeamName}
+				</if>
+				
+	</select>
+	
+	<select id="getProjNameById" parameterType="java.lang.String" resultType="java.lang.String">
+		select PROJECT_NAME from proj_basic_info where PROJECT_ID = #{value}
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+

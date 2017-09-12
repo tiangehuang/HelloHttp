@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.epro.pms.project_basic_info.dao.StatisticalFormMapper" >
+  <resultMap id="BaseResultMap" type="com.epro.pms.project_basic_info.po.StatisticalFormInfo" >
+    <id column="PROJECT_ID" property="projdecId" jdbcType="INTEGER" />
+     <result column="mixedTypeTeam" property="mixedTypeTeam" jdbcType="INTEGER" />
+     <result column="taskTeam" property="taskTeam" jdbcType="INTEGER" />
+     <result column="openingTeam" property="openingTeam" jdbcType="INTEGER" />
+     <result column="resourceTeam" property="resourceTeam" jdbcType="INTEGER" />
+     <result column="e2eTeam" property="e2eTeam" jdbcType="INTEGER" />
+     <result column="openingAccount" property="openingAccount" jdbcType="INTEGER" />
+     <result column="taskAccount" property="taskAccount" jdbcType="INTEGER" />
+     <result column="resourceAccount" property="resourceAccount" jdbcType="INTEGER" />
+     <result column="projectAccount" property="projectAccount" jdbcType="INTEGER" />
+    <result column="CONTRACT_ID" property="contractId" jdbcType="INTEGER" />
+    <result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR" />
+    <result column="CURR_B_MODEL" property="currBModel" jdbcType="INTEGER" />
+    <result column="PLAN_B_MODEL" property="planBModel" jdbcType="INTEGER" />
+    <result column="DEV_OR_CUSTOM" property="devOrCustom" jdbcType="INTEGER" />
+    <result column="PROJECT_FLOW" property="projectFlow" jdbcType="INTEGER" />
+    <result column="CURR_PROJECT_TYPE" property="currProjectType" jdbcType="INTEGER" />
+    <result column="PLAN_PROJECT_TYPE" property="planProjectType" jdbcType="INTEGER" />
+    <result column="FINISH_TIME" property="finishTime" jdbcType="DATE" />
+    <result column="CODE_TYPE" property="codeType" jdbcType="INTEGER" />
+    <result column="PROJECT_TYPE" property="projectType" jdbcType="INTEGER" />
+    <result column="PRODUCT_LINE" property="productLine" jdbcType="VARCHAR" />
+    <result column="PRODUCT" property="product" jdbcType="VARCHAR" />
+    <result column="AREA" property="area" jdbcType="VARCHAR" />
+    <result column="EPM_NAME" property="ePmName" jdbcType="VARCHAR" />
+    <result column="EPM_NO" property="ePmNo" jdbcType="VARCHAR" />
+    <result column="EQA_NAME" property="eQaName" jdbcType="VARCHAR" />
+    <result column="EQA_NO" property="eQaNo" jdbcType="VARCHAR" />
+    <result column="ECMO_NAME" property="eCmoName" jdbcType="VARCHAR" />
+    <result column="ECMO_NO" property="eCmoNo" jdbcType="VARCHAR" />
+    <result column="EMC_NAME" property="eMcName" jdbcType="VARCHAR" />
+    <result column="EMC_NO" property="eMcNo" jdbcType="VARCHAR" />
+    <result column="ECIE_NAME" property="eCieName" jdbcType="VARCHAR" />
+    <result column="ECIE_NO" property="eCieNo" jdbcType="VARCHAR" />
+    <result column="ETC_NAME" property="eTcName" jdbcType="VARCHAR" />
+    <result column="ETC_NO" property="eTcNo" jdbcType="VARCHAR" />
+    <result column="HPM_NAME" property="hPmName" jdbcType="VARCHAR" />
+    <result column="HPM_NO" property="hPmNo" jdbcType="VARCHAR" />
+    <result column="HQA_NAME" property="hQaName" jdbcType="VARCHAR" />
+    <result column="HQA_NO" property="hQaNo" jdbcType="VARCHAR" />
+    <result column="HCMO_NAME" property="hCmoName" jdbcType="VARCHAR" />
+    <result column="HCMO_NO" property="hCmoNo" jdbcType="VARCHAR" />
+    <result column="QA_MONITOR_LEVEL" property="qaMonitorLevel" jdbcType="VARCHAR" />
+    <result column="PROJ_HEALTH_LEVEL" property="projHealthLevel" jdbcType="VARCHAR" />
+    <result column="PROJECT_STATUS" property="projectStatus" jdbcType="VARCHAR" />
+    <result column="IS_TOP_PROJECT" property="isTopProject" jdbcType="INTEGER" />
+    <result column="IS_QUALIY_REPORT" property="isQualiyReport" jdbcType="INTEGER" />
+    <result column="MDE_COUNT" property="mdeCount" jdbcType="INTEGER" />
+    <result column="PL_COUNT" property="plCount" jdbcType="VARCHAR" />
+    <result column="TC_COUNT" property="tcCount" jdbcType="INTEGER" />
+    <result column="CODER_COUNT" property="coderCount" jdbcType="VARCHAR" />
+    <result column="TESTER_COUNT" property="testerCount" jdbcType="INTEGER" />
+    <result column="SKELETON_COUNT" property="skeletonCount" jdbcType="INTEGER" />
+    <result column="FIRST_HW_COUNT" property="firstHwCount" jdbcType="INTEGER" />
+    <result column="END_HW_COUNT" property="endHwCount" jdbcType="INTEGER" />
+    <result column="COUNT" property="count" jdbcType="INTEGER" />
+    <result column="OFFSITE_COUNT" property="offsiteCount" jdbcType="INTEGER" />
+    <result column="ONSITE_COUNT" property="onsiteCount" jdbcType="INTEGER" />
+    <result column="OFFSITE_AREA" property="offsiteArea" jdbcType="VARCHAR" />
+    <result column="ONSITE_AREA" property="onsiteArea" jdbcType="VARCHAR" />
+    <result column="PROJECT_STATE" property="projectState" jdbcType="VARCHAR" />
+    <result column="PERSONNEL_STATE" property="personnelState" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    PROJECT_ID,
+    CONTRACT_ID,
+    PROJECT_NAME,
+    CURR_BUSINESS_MODEL,
+    PLAN_BUSINESS_MODEL,
+    DEV_OR_CUSTOMIZATION,
+    PROJECT_FLOW,
+    CURR_PROJECT_TYPE,
+    PLAN_PROJECT_TYPE,
+    FINISH_TIME,
+    CODE_TYPE,
+    PROJECT_TYPE,
+    PRODUCT_LINE,PRODUCT,AREA,EPRO_PM_USER_ID,EPRO_QA_USER_ID,EPRO_CMA_USER_ID,EPRO_MC_USER_ID,EPRO_CI_USER_ID,
+	EPRO_TC_USER_ID,HW_PM_LNAME,HW_QA_LNAME,HW_CMO_LNAME,QA_MONITOR_LEVEL,PROJ_HEALTH_LEVEL,PROJECT_STATUS,
+	IS_IMPORTANT_PROJECT,IS_HAS_QUALIY_REPORT,IS_PUT_ON_FILE,MDE_COUNT,PL_COUNT,TC_COUNT,CODER_COUNT,TESTER_COUNT,
+	SKELETON_COUNT,FIRST_HW_COUNT,END_HW_COUNT,PROJECT_PERSON_COUNT,OFFSHORE_PERSON_COUNT,SCENE_PERSON_COUNT,OFFSHORE_AREA,
+	SCENE_AREA,CURR_PROBLEM,PROJECT_MEMBERS_PROBLEM
+  </sql>
+
+	
+	<select id="getAreaData" resultMap="BaseResultMap">
+		SELECT * from proj_basic_info i
+	</select>
+
+	<!-- <select id="listStatisticalForm" parameterType="com.epro.pms.project_basic_info.po.StatisticalFormInfo" resultMap="BaseResultMap">
+		SELECT
+			PRODUCT_LINE,
+			AREA,
+			SUM(
+			CASE
+			WHEN CURR_PROJECT_TYPE = '1' THEN
+			COUNT
+			END
+			) AS mixedTypeTeam,
+			SUM(
+			CASE
+			WHEN CURR_PROJECT_TYPE = '2' THEN
+			COUNT
+			END
+			) AS resourceTeam,
+			SUM(
+			CASE
+			WHEN CURR_PROJECT_TYPE = '3' THEN
+			COUNT
+			END
+			) AS taskTeam,
+			SUM(
+			CASE
+			WHEN CURR_PROJECT_TYPE = '4' THEN
+			COUNT
+			END
+			) AS openingTeam,
+			SUM(
+			CASE
+			WHEN CURR_PROJECT_TYPE = '5' THEN
+			COUNT
+			END
+			) AS e2eTeam
+			FROM
+			PROJ_BASIC_INFO WHERE status = 1
+			<if test="area !=null and area !='' ">
+	 			and AREA = #{area}
+	 		</if>
+	 		<if test="productLine != null and productLine !='' ">
+	 			and PRODUCT_LINE = #{productLine}
+	 		</if>
+	 		<if test="ePmName != null and ePmName !=''">
+				AND EPM_NAME = #{ePmName}
+			</if>
+		GROUP BY PRODUCT_LINE
+		
+	</select> -->
+	<select id="listStatisticalForm" parameterType="com.epro.pms.project_basic_info.po.StatisticalFormInfo" resultMap="BaseResultMap">
+		SELECT P.PRODUCT_LINE,P.AREA,
+			SUM(CASE WHEN p.CURR_PROJECT_TYPE = 1 THEN T.COUNTS END) AS mixedTypeTeam,
+			SUM(CASE WHEN p.CURR_PROJECT_TYPE = 2 THEN T.COUNTS END) AS resourceTeam,
+			SUM(CASE WHEN p.CURR_PROJECT_TYPE = 3 THEN T.COUNTS END) AS taskTeam,
+			SUM(CASE WHEN p.CURR_PROJECT_TYPE = 4 THEN T.COUNTS END) AS openingTeam,
+			SUM(CASE WHEN p.CURR_PROJECT_TYPE = 5 THEN T.COUNTS END) AS e2eTeam
+			FROM (SELECT PROJECT_ID,COUNT(id) AS counts FROM proj_person WHERE IS_LEAVE=0 GROUP BY PROJECT_ID) T
+			LEFT JOIN proj_basic_info p ON T.PROJECT_ID = P.PROJECT_ID WHERE P.STATUS = 1
+			<if test="area !=null and area !='' ">
+	 			AND P.AREA = #{area}
+	 		</if>
+	 		<if test="productLine != null and productLine !='' ">
+	 			AND P.PRODUCT_LINE = #{productLine}
+	 		</if>
+	 		<if test="ePmName != null and ePmName !=''">
+				AND P.EPM_NAME = #{ePmName}
+			</if>
+		GROUP BY P.PRODUCT_LINE
+		
+	</select>
+  
+</mapper>

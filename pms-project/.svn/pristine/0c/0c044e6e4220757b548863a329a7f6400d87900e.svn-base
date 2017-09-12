@@ -1,0 +1,173 @@
+package com.epro.pms.project_basic_info.service.impl;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.epro.pms.project_basic_info.dao.WorkWeeklyMapper;
+import com.epro.pms.project_basic_info.service.WorkWeeklyService;
+import com.epro.pms.util.WeekToTimeUtils;
+import com.epro.pms.util.report.ExcelUtil;
+@Service
+public class WorkWeeklyServiceImpl implements WorkWeeklyService{
+
+	@Autowired
+	private WorkWeeklyMapper workWeeklyMapper;
+	/**
+	 * 查询所有项目，所有周期，最新周报
+	 */
+	@Override
+	public List<Map<String, Object>> getProjectANDWeekloads(
+			Map<String, Object> condition) {
+		List<Map<String, Object>> weeklyloadReports = new ArrayList<Map<String, Object>>();
+		Map<String, Object> weeklyloadReport = null;
+		//默认获取上一周的period
+//		String curPeriod = null;
+//		Calendar now = Calendar.getInstance();
+//		now.setTimeInMillis(System.currentTimeMillis());
+//		curPeriod = now.get(Calendar.YEAR) * 100 + now.get(Calendar.WEEK_OF_YEAR) - 1 + "";				
+		
+		//获取所有的项目信息
+		List<Map<String, Object>> projectList = workWeeklyMapper.getProjects(condition);	
+		Integer currProjectId = 0;
+		Map<String, Object> param = new HashMap<String, Object>();
+		for (int i = 0; i < projectList.size(); i++) {
+			weeklyloadReport = new HashMap<String, Object>();
+			currProjectId = (Integer) projectList.get(i).get("projectId");
+			param.put("projectId", currProjectId);
+//			param.put("period", curPeriod);
+			// 获取所有员工的周报信息
+//			List<Map<String,Object>> emps = workWeeklyMapper.getProjectWeekloads(param);
+//			param.remove("period");
+			//获取已有的项目周期
+			List<Map<String,Object>> periods = workWeeklyMapper.getProjectPeriod(param);
+			
+			weeklyloadReport.put("weeklyload", projectList.get(i));
+//			weeklyloadReport.put("emps", emps);
+			weeklyloadReport.put("periods", periods);
+			weeklyloadReports.add(i,weeklyloadReport);
+		}
+		return weeklyloadReports;
+	}
+	/**
+	 * 增加周报
+	 */
+	@Override
+	public Map<String, Object> getPersonAndPeriod(
+			Map<String, Object> condition) throws ParseException {
+		Map<String,Object> periodAndPerson = new HashMap<String, Object>();
+		WeekToTimeUtils weekToTime = new WeekToTimeUtils();
+		String period = (String) condition.get("weekPeriod");
+		String projectId = (String) condition.get("projectId");
+		Map<String, Object> person = new HashMap<String, Object>();
+		
+		String startTime;
+		String endTime;
+		//周期为空，说明是第一次添加周报，需要根据项目的起始时间添加
+		if(period==""||period==null){
+			//周期 curPeriod、开始时间、结束时间
+			person.put("projectId", Integer.valueOf(projectId));
+			List<Map<String, Object>> projectList = workWeeklyMapper.getProjects(person);
+			startTime = projectList.get(0).get("pStartTime").toString();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Calendar nows = Calendar.getInstance();
+			nows.setTime(sdf.parse(startTime));
+			String curPeriod = nows.get(Calendar.YEAR) * 100 + nows.get(Calendar.WEEK_OF_YEAR) + "";
+			endTime = weekToTime.getEndTimeByWeek(curPeriod);
+			periodAndPerson.put("curPeriod", curPeriod);
+		}else{//否则获取根据当前的周时间，获取下一周的周期
+			//周期curPeriod、开始时间、结束时间
+			Integer curPeriod = Integer.valueOf(period)+1;
+			startTime = weekToTime.getStartTimeByWeek(String.valueOf(curPeriod));
+			endTime = weekToTime.getEndTimeByWeek(String.valueOf(curPeriod));
+			periodAndPerson.put("curPeriod", curPeriod);
+		}
+		periodAndPerson.put("startTime", startTime);
+		periodAndPerson.put("endTime", endTime);
+		List<Map<String, Object>> personList = workWeeklyMapper.getPersonByProjectId(Integer.valueOf(projectId));
+		periodAndPerson.put("personList", personList);
+		return periodAndPerson;
+	}
+	/**
+	 * 保存周报
+	 */
+	@Override
+	public List<Map<String,Object>> saveAllMessages(Map<String, Object> condition) {		
+		//项目名称、项目组名称、项目编号、周总工作量、团队名称、周期、开始时间、结束时间
+/*		String projectId = (String) condition.get("projectId");
+		String projectName = (String) condition.get("projectName");
+		String projectTeamName = (String) condition.get("projectTeamName");
+		String projectNo = (String) condition.get("projectNo");
+		String wAllWorkload = (String) condition.get("totalWeekWorkloads");
+		String period = (String) condition.get("period");
+		String startTime = (String) condition.get("startTime");
+		String endTime = (String) condition.get("endTime");*/
+		//取出周报信息
+		List<Map<String,Object>> weekList = (List) condition.get("emps");
+		
+		String tId = (String) weekList.get(0).get("tId");
+		//如果传过来的ID为null，则新增，否则修改
+		if(tId==""||tId==null){
+			//添加项目周期
+			workWeeklyMapper.insertPeriod(condition);
+			//增加项目信息
+			workWeeklyMapper.insertTimesheet(weekList);
+		}else{
+			for (int i = 0; i < weekList.size(); i++) {
+				workWeeklyMapper.updateTimesheetById(weekList.get(i));
+			}			
+		}
+		//返回自增的主键值
+		return weekList;
+	}
+	/**
+	 * 获取所有周报信息
+	 */
+	@Override
+	public List<Map<String, Object>> getWeeksByPeriod(
+			Map<String, Object> condition) {
+		List<Map<String,Object>> workloadsList = workWeeklyMapper.getProjectWeekloads(condition);
+		return workloadsList;
+	}
+	@Override
+	public boolean downLoadWeeklyReport(String path,Map<String, Object> condition) {
+		boolean isHaveData = false;
+		List<ArrayList<String>> weekListAll = new ArrayList<ArrayList<String>>();
+		List<Map<String,Object>> workloadsList = workWeeklyMapper.getProjectWeekloads(condition);
+		boolean flag = condition.get("projName").equals("所有项目");
+		String fileName = "";
+		if(flag){
+			fileName = "项目周报.xlsx";
+		}else{
+			fileName = condition.get("projName")+"项目周报.xlsx";
+		}	
+		for(int i=0;i<workloadsList.size();i++){
+			Map<String,Object> map = new HashMap<>();
+			ArrayList<String> weekList = new ArrayList<>();
+			map = workloadsList.get(i);
+			weekList.add(map.get("projectName").toString());
+			weekList.add(map.get("projectTeamName").toString());
+			weekList.add(map.get("name").toString());
+			weekList.add(map.get("eproNo").toString());
+			weekList.add(map.get("startTime").toString());
+			weekList.add(map.get("endTime").toString());
+			weekList.add(map.get("weekWorkload").toString());
+			weekList.add(map.get("wCapcity").toString());
+			weekList.add(map.get("wAllWorkload").toString());
+			weekList.add(map.get("remark").toString());
+			weekListAll.add(weekList);
+		}
+		if(weekListAll != null){
+			isHaveData = true;
+			ExcelUtil.writeWeeklyReport2Excel(path,weekListAll,fileName);
+		}
+		return isHaveData;
+	}	
+}

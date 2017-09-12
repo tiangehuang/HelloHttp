@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.epro.pms.project_basic_info.dao.IProjEmployeeMapper" >
+	<!-- 通过项目id查询项目信息 -->
+	<select id="queryProjInfoById" parameterType="java.lang.String" resultType="com.epro.pms.project_basic_info.po.ProjectBasicInfo">
+		select 
+			pbi.project_id 		as projectId,
+			pbi.project_name 	as projectName,
+			pbi.product_line 	as productLine,
+		 	pbi.product 		as product,
+			pbi.onsite_area 	as onsiteArea,
+			pbi.area 			as area,
+			pbi.EPM_NAME 		as ePmName,
+			case pc.cooperation_type 
+				when 0 then '委托开发'
+				when 1 then '总部定制'
+				else '现场定制'
+			end					as corpType,
+			case pc.cooperation_mode 
+				when 1 then 'FP'
+				else 'TM'
+			end					as corpMode,
+			pc.proj_team_name 	as projTeamName,
+			pc.DEPT_MANAGER		as deptManager
+		from proj_basic_info pbi
+		join proj_contract pc on pbi.contract_id = pc.contract_id
+		where pbi.project_id = #{param1}
+	</select>
+	
+	<!-- 插入核心骨干员工信息（批量） -->
+	<insert id="insertCoreEmployees" parameterType="java.util.List"> 
+		insert into proj_core_person 
+		(project_id,epro_no,`name`,plan_role,seperation_level,is_seperation,`desc`,stability_measure)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(
+				#{item.projectId, jdbcType=INTEGER},
+				#{item.jobNumber, jdbcType=VARCHAR},
+				#{item.personName, jdbcType=VARCHAR},
+				#{item.planRole, jdbcType=VARCHAR},
+				1,0,'',''
+			)
+		</foreach>
+	</insert>
+	
+	<insert id="insertCoreEmployee" parameterType="java.util.Map">
+		INSERT INTO 
+			proj_core_person(
+				project_id,			epro_no,			`name`,		
+				plan_role,			seperation_level,	is_seperation,	
+				`desc`,				stability_measure
+			) VALUES (
+				#{projectId},		#{eproNo},		#{name},
+				'',					1,					0,
+				'',					''
+			)
+		
+	</insert>
+	
+	<!-- 删除核心人员信息 -->
+	<delete id="delectCoreEmployeeByEproNo" parameterType="java.util.Map">
+		DELETE FROM
+			proj_core_person
+		WHERE 
+			EPRO_NO = #{eproNo}
+	</delete>
+	
+	<select id="getCoreEmployeeByEproNo" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT 
+			ID					AS id,
+			PROJECT_ID			AS projectId,
+			EPRO_NO				AS eproNo,
+			`NAME`				AS name,
+			PLAN_ROLE			AS planRole,
+			SEPERATION_LEVEL	AS seperationLevel,
+			IS_SEPERATION		AS isSeperation,
+			`DESC`				AS 'desc',
+			STABILITY_MEASURE	AS stabilityMeasure
+		FROM
+			proj_core_person
+		WHERE 
+			EPRO_NO = #{eproNo}	
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

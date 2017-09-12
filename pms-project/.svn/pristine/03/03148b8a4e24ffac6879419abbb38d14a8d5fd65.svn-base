@@ -1,0 +1,172 @@
+package com.epro.pms.project_basic_info.controller;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.epro.pms.exception.CommonException;
+import com.epro.pms.project_basic_info.service.WorkWeeklyService;
+import com.epro.pms.util.po.Header;
+import com.epro.pms.util.po.Response;
+import com.epro.pms.util.po.RspConst;
+import com.epro.pms.util.upload.UploadUtil;
+
+@Controller
+@RequestMapping("/weekly")
+public class WorkWeeklyController {
+	private static Log log = LogFactory.getLog(WorkWeeklyController.class);
+	@Autowired
+	private WorkWeeklyService workWeeklyService;
+	/**
+	 * 查询项目
+	 * @param paramMap
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getWorkWeekly.do", method = RequestMethod.POST)
+	public Map<String, Object> getWorkWeekly(@RequestBody Map<String, Object> paramMap,HttpServletRequest req){
+		Map<String, Object> header = (Map<String, Object>) paramMap.get("header");
+		Map<String, Object> request = (Map<String, Object>) paramMap.get("request");
+		List<Map<String, Object>> weeklyloadReport = workWeeklyService.getProjectANDWeekloads(request);	
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put(RspConst.HEADER, new Header(RspConst.SUCCESS_CODE,RspConst.SUCCESS_MSG,1,1,1));
+		resMap.put(RspConst.RESPONSE,new Response("result", weeklyloadReport));		
+		
+		return resMap;
+	}
+	/**
+	 * 查询周报信息
+	 * @param paramMap
+	 * @return
+	 * @throws ParseException
+	 */
+	@ResponseBody
+	@RequestMapping(value="getPersonWork.do",method=RequestMethod.POST)
+	public Map<String,Object> getPersonWork(@RequestBody Map<String, Object> paramMap) throws ParseException{
+		Map<String, Object> header = (Map<String, Object>) paramMap.get("header");
+		Map<String, Object> request = (Map<String, Object>) paramMap.get("request");
+		
+		Map<String, Object> personPeriod = workWeeklyService.getPersonAndPeriod(request);
+		
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put(RspConst.HEADER, new Header(RspConst.SUCCESS_CODE, RspConst.SUCCESS_MSG, 1, 1, 1));
+		resMap.put(RspConst.RESPONSE,new Response("result", personPeriod));
+		return resMap;
+	}
+	/**
+	 * 增加周报
+	 * @param paramMap
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="saveWeekWorkloads.do",method=RequestMethod.POST)
+	public Map<String,Object> saveWeekWorkloads(@RequestBody Map<String, Object> paramMap){
+		Map<String, Object> header = (Map<String, Object>) paramMap.get("header");
+		Map<String, Object> request = (Map<String, Object>) paramMap.get("request");
+		List<Map<String,Object>> weekList = workWeeklyService.saveAllMessages(request);
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put(RspConst.HEADER, new Header(RspConst.SUCCESS_CODE, RspConst.SUCCESS_MSG, 1, 1, 1));
+		resMap.put(RspConst.RESPONSE,new Response("result", weekList));
+		return resMap;
+	}
+	/**
+	 * 根据项目ID和周期值 获取周期的工作量
+	 * @param paramMap
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="queryWorkloadByPeriod.do",method=RequestMethod.POST)
+	public Map<String,Object> queryWorkloadByPeriod(@RequestBody Map<String, Object> paramMap){
+		Map<String, Object> header = (Map<String, Object>) paramMap.get("header");
+		Map<String, Object> request = (Map<String, Object>) paramMap.get("request");
+		List<Map<String,Object>> workloadsList = workWeeklyService.getWeeksByPeriod(request);
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put(RspConst.HEADER, new Header(RspConst.SUCCESS_CODE, RspConst.SUCCESS_MSG, 1, 1, 1));
+		resMap.put(RspConst.RESPONSE,new Response("result", workloadsList));
+		return resMap;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "getProjectName.do", method = RequestMethod.POST)
+	public Map<String, Object> getProjectName(@RequestBody Map<String, Object> paramMap,HttpServletRequest req){
+		Map<String, Object> header = (Map<String, Object>) paramMap.get("header");
+		Map<String, Object> request = (Map<String, Object>) paramMap.get("request");
+		List<Map<String, Object>> weeklyloadReport = workWeeklyService.getProjectName(request);	
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put(RspConst.HEADER, new Header(RspConst.SUCCESS_CODE,RspConst.SUCCESS_MSG,1,1,1));
+		resMap.put(RspConst.RESPONSE,new Response("result", weeklyloadReport));		
+		return resMap;
+	}
+	
+
+	/** 
+	  * @MethodName: downLoadWeeklyReport  
+	  * @Description: 导出项目周报      
+	  * @return Map<String,Object>
+	  * @param paramMap
+	  * @return
+	  * @throws CommonException 
+	  */
+	@ResponseBody
+	@RequestMapping(value = "/downLoadWeekly.do",method = RequestMethod.GET) 
+	public Map<String, Object> downLoadWeekly(HttpServletRequest request,HttpServletResponse response) throws CommonException {  
+		//导出周报所需参数
+		String projectId = "";
+		String fileName = "";
+		String fullName = "";
+		//对中文进行转码
+		try {
+			projectId = new String((request.getParameter("projectId")).getBytes("iso-8859-1"),"utf-8");
+			fileName = workWeeklyService.getProjectNameById(projectId);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		//导出文件所在路径
+		String exportPath = request.getSession().getServletContext().getRealPath("/") + "download";
+		
+		if("".equals(fileName)){
+			fullName = exportPath + "\\项目周报.xlsx";
+		}else{
+			fullName = exportPath + "\\" + fileName + "项目周报.xlsx";
+		}
+		
+		Map<String,Object> requestMap = new HashMap<>();
+		requestMap.put("projectId", projectId);
+		requestMap.put("projectName", fileName);
+		//生成excel
+		boolean flag = workWeeklyService.downLoadWeeklyReport(exportPath,requestMap);
+		
+		
+		if(fileName == null){
+			fileName = "";
+		}
+		if(fileName == null || "".equals(fileName)){
+			UploadUtil.downLoad(request, response, "项目周报.xlsx", fullName);
+			UploadUtil.deleteFile(fullName);
+		}else{
+			UploadUtil.downLoad(request, response, fileName+".xlsx", fullName);
+			UploadUtil.deleteFile(fullName);
+		}
+		String rspcode = flag == true ? RspConst.SUCCESS_CODE : RspConst.FAIL_CODE; 
+ 		String rspdesc = flag == true ? RspConst.SUCCESS_MSG : RspConst.FAIL_MSG; 
+ 		
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put(RspConst.HEADER, new Header(rspcode, rspdesc, 0, 0, 0));
+		return resMap;
+	}
+}

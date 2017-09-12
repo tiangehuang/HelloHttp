@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.epro.pms.project_basic_info.dao.ProjectTeamEmployeeMapper">
+
+	<!-- 更新项目组人员信息 -->
+	<update id="updateProjectteamPersonById" parameterType="java.util.Map">
+		UPDATE
+			projteam_person
+		<set>
+			<if test="teamMember != null">
+				TEAM_MEMBER = #{teamMember}
+			</if>
+		</set>
+		WHERE
+			PROJ_TEAM_ID = #{projTeamId}
+	</update>
+	
+	<!-- 通过ID获取项目组信息 -->
+	<select id="getProjectteamPersonById" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			TEAM_MEMBER		AS teamMember
+		FROM
+			projteam_person
+		WHERE
+			PROJ_TEAM_ID = #{projTeamId}
+	</select>
+	
+	
+	<!--  -->
+	<select id="getProjectPersonByProjectIdOrEmpIdOrIsleave" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			ID				AS id,
+			EMPLOYEE_ID		AS employeeId,
+			PERSON_NAME		AS personName,
+			PROJ_TEAM_ID	AS projTeamId,
+			PROJECT_PO		AS projectPO,
+			IS_CORE_ROLE	AS isCoreRole,
+			PLAN_ROLE		AS planRole
+		FROM
+			proj_person
+		WHERE
+			1 = 1
+		<if test="projectId != null"></if>
+			AND PROJECT_ID = #{projectId} 
+		<if test="isLeave != null">
+			AND IS_LEAVE = #{isLeave}
+		</if>
+		<if test="employeeId != null">
+			AND EMPLOYEE_ID = #{employeeId}
+		</if>
+			
+	</select>
+	
+	<insert id="insertProjectPerson" parameterType="java.util.Map">
+		INSERT INTO
+			proj_person(
+				EMPLOYEE_ID,	PERSON_NAME,	HW_NO,
+				PROJECT_ID,		PROJECT_PO,		PROJ_TEAM_ID,
+				CURRENT_ROLE,	PLAN_ROLE,		IS_NEED_DEVELOP,
+				TUTOR_USER_NAME,PLAN_ANSWER_TIME,DEVELOP_TARGET,
+				DEVELOP_PLAN,	IS_DEVELOP_DONE,IS_ANSWER_PASSED,
+				IS_KEY_ROLE,	IS_CORE_ROLE,	IS_LEAVE,
+				`DESC`		
+			)VALUES(
+				#{employeeId},	#{personName},	#{hwNo},
+				#{projectId},	#{projectPO},	#{projTeamId},
+				#{currentRole},	#{planRole},	#{isNeedDevelop},
+				#{tutorUserName},#{planAnswerTime},#{developTarget},
+				#{developPlan},	#{isDevelopDone},#{isAnswerPassed},
+				#{isKeyRole},	#{isCoreRole},	#{isLeave},
+				#{desc}		
+			)
+	</insert>
+	
+	<update id="updateProjectPerson" parameterType="java.util.Map">
+		UPDATE
+			proj_person
+		<set>
+			<if test="currentRole != null">
+				CURRENT_ROLE = #{currentRole},
+			</if>
+			<if test="planRole != null">
+				PLAN_ROLE = #{planRole},
+			</if>
+			<if test="isNeedDevelop != null">
+				IS_NEED_DEVELOP = #{isNeedDevelop},
+			</if>
+			<if test="planAnswerTime != null">
+				PLAN_ANSWER_TIME = #{planAnswerTime},
+			</if>
+			<if test="developTarget != null">
+				DEVELOP_TARGET = #{developTarget},
+			</if>
+			<if test="developPlan != null">
+				DEVELOP_PLAN = #{developPlan},
+			</if>
+			<if test="isDevelopDone != null">
+				IS_DEVELOP_DONE = #{isDevelopDone},
+			</if>
+			<if test="isAnswerPassed != null">
+				IS_ANSWER_PASSED = #{isAnswerPassed},
+			</if>
+			<if test="isKeyRole != null">
+				IS_KEY_ROLE = #{isKeyRole},
+			</if>
+			<if test="isCoreRole != null">
+				IS_CORE_ROLE = #{isCoreRole},
+			</if>
+			<if test="isLeave != null">
+				IS_LEAVE = #{isLeave},
+			</if>
+		</set>
+		WHERE
+			ID = #{id}
+	</update>
+	
+	<update id="updateIsLeave" parameterType="java.util.Map">
+		UPDATE
+			proj_person
+		<set>
+			<if test="newIsLeave != null">
+				IS_LEAVE = #{newIsLeave},
+			</if>
+		</set>
+		WHERE
+			EMPLOYEE_ID = #{employeeId} AND IS_LEAVE = #{isLeave}
+	</update>
+	
+	
+	<!--  -->
+	<select id="getCorePersonByProjectIdOrEproNo" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			ID					AS id,
+			PROJECT_ID			AS projectId,
+			EPRO_NO				AS eproNo,
+			NAME				AS name,
+			PLAN_ROLE			AS planRole,
+			SEPERATION_LEVEL	AS seperationLevel,
+			IS_SEPERATION		AS isSeperation,
+			`DESC`				AS 'desc',
+			STABILITY_MEASURE	AS stabilityMeasure
+		FROM 
+			proj_core_person
+		WHERE 
+			1 = 1
+			<if test="projectId != null">
+				AND PROJECT_ID = #{projectId}
+			</if>
+			<if test="eproNo != null">
+				AND EPRO_NO = #{eproNo}
+			</if>
+	</select>
+	
+	<insert id="insertCorePerson" parameterType="java.util.Map">
+		INSERT INTO 
+			proj_core_person(
+				project_id,			epro_no,			`name`,		
+				plan_role,			seperation_level,	is_seperation,	
+				`desc`,				stability_measure
+			) VALUES (
+				#{projectId},		#{eproNo},		#{name},
+				'',					1,					0,
+				'',					''
+			)
+	</insert>
+	
+	<delete id="deleteCorePersonByProjectIdOrEproNo" parameterType="java.util.Map">
+		DELETE FROM
+			proj_core_person
+		WHERE
+			1 = 1
+			<if test="projectId != null">
+				AND PROJECT_ID = #{projectId}
+			</if>
+			<if test="eproNo != null">
+				AND EPRO_NO = #{eproNo}
+			</if>
+	</delete>
+	
+	<select id="getEmpsAndCoreByProjectId" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			p.EMPLOYEE_ID		AS eproNo,
+			p.PERSON_NAME		AS name,
+			p.PLAN_ROLE			AS planRole,
+			p.IS_CORE_ROLE		AS isCoreRole,
+			c.SEPERATION_LEVEL	AS seperationLevel,
+			c.DESC				AS `desc`,
+			c.STABILITY_MEASURE	AS stabilityMeasure
+		FROM
+			proj_person p
+		LEFT JOIN 
+			proj_core_person c 
+		ON 
+			p.EMPLOYEE_ID = c.EPRO_NO AND p.PROJECT_ID = c.PROJECT_ID
+		WHERE
+			p.PROJECT_ID = #{projectId} AND IS_LEAVE = #{isLeave}
+	
+	</select>
+	
+	<update id="updateProjectPersons" parameterType="java.util.Map">
+		UPDATE
+			proj_person
+		SET
+			IS_LEAVE = #{newIsLeave}
+		WHERE
+			PROJECT_ID = #{projectId} AND IS_LEAVE = #{isLeave}
+	</update>
+	
+
+</mapper>
+
+
+
+
+

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.epro.pms.common.dao.ICommonMapper">
+  	<!-- 查询产品线下拉框列表  -->
+	<select id="queryProLineOptionList" resultType="com.epro.pms.common.po.OptionPO">
+		select distinct product_line as value, product_line as text from dictionary_pdu
+		<where>
+			<if test="productLine != null and productLine != ''">
+				and product_line like CONCAT('%',#{productLine, jdbcType=VARCHAR},'%')
+			</if>
+		</where>
+		order by product_line asc
+	</select>
+	
+	<!-- 根据产品线查询其下的PDU -->
+	<select id="queryPDUOptionList" resultType="com.epro.pms.common.po.OptionPO">
+		select pdu as value, pdu as text from dictionary_pdu
+		<where>
+			<if test="productLine != null and productLine != ''">
+				and product_line = #{productLine, jdbcType=VARCHAR}
+			</if>
+			<if test="pdu != null and pdu != ''">
+				and pdu like CONCAT('%',#{pdu, jdbcType=VARCHAR},'%')
+			</if>
+		</where>
+		order by pdu asc
+	</select>
+	
+	<!-- 查询是否存在对应产品线和产品记录 -->
+	<select id="isProLineAndPduExists" parameterType="java.util.Map" resultType="java.lang.Boolean">
+		select case count(id) when 0 then 0 else 1 end 
+		from dictionary_pdu 
+		where product_line = #{productLine, jdbcType=VARCHAR} and pdu = #{pdu, jdbcType=VARCHAR} 
+	</select>
+	
+	<!-- 插入新的产品线和产品 -->
+	<insert id="insertProLineAndPdu" parameterType="java.util.Map">
+		insert into dictionary_pdu(product_line, pdu) 
+		values(#{productLine, jdbcType=VARCHAR}, #{pdu, jdbcType=VARCHAR})
+	</insert>
+	
+	<select id="queryProjTeamMaxNo" resultType="java.lang.String" parameterType="java.util.Map">
+		select IFNULL(COUNT(*),1) from proj_start_list 
+		where area = #{area} and product_line = #{proline}
+	</select>
+	
+	<!-- 查询项目组编码是否存在 -->
+	<select id="queryProjTeamNo" resultType="java.lang.String" parameterType="java.lang.String">
+		select PROJ_TEAM_ID from projteam_person where PROJ_TEAM_ID = #{value,jdbcType=VARCHAR}
+	</select>
+</mapper>

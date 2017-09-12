@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.epro.pms.project_basic_info.dao.RiskProjectMapper">
+	<resultMap id="BaseResultMap" type="com.epro.pms.project_basic_info.po.RiskProject">
+		<id column="PROJECT_ID" property="projectId" jdbcType="INTEGER"/>
+		<result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR"/>
+		<result column="PROJ_VERSION" property="projVersion" jdbcType="VARCHAR"/>
+		<result column="RISK_TYPE" property="riskType" jdbcType="VARCHAR"/>
+		<result column="ORDERLIES" property="orderlies" jdbcType="VARCHAR"/>
+		<result column="RISK_ISSUES" property="riskIssues" jdbcType="VARCHAR"/>
+		<result column="RISK_STATUS" property="riskStatus" jdbcType="VARCHAR"/>
+		<result column="IS_RISK_ASCEND" property="isRiskAscend" jdbcType="VARCHAR"/>
+		<result column="PO_STATUS_RISK" property="poStatusRisk" jdbcType="VARCHAR"/>
+		
+		<result column="PRODUCT" property="product" jdbcType="VARCHAR"/>
+		<result column="AREA" property="area" jdbcType="VARCHAR"/>
+		<result column="PRODUCT_LINE" property="productLine" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<!-- 添加重点/风险项目 -->
+	<insert id="insert" parameterType="java.util.HashMap">
+		INSERT INTO risk_project(
+			PROJECT_ID, PROJECT_NAME, PROJ_VERSION,
+			RISK_TYPE, ORDERLIES, RISK_ISSUES,
+			RISK_STATUS, IS_RISK_ASCEND, PO_STATUS_RISK
+		)
+		VALUES(
+			#{projectId}, #{projectName}, #{projVersion},
+			#{riskType}, #{orderlies}, #{riskIssues},
+			#{riskStatus}, #{isRiskAscend}, #{poStatusRisk}
+		)
+	</insert>
+	
+	<!-- 删除重点/风险项目 -->
+	<delete id="deleteRiskProjectByPK" parameterType="java.lang.Integer">
+		DELETE FROM risk_project
+		WHERE PROJECT_ID = #{projectId}
+	</delete>
+	
+	<!-- 更新重点/风险项目 -->
+	<update id="updateRiskProjectByPK" parameterType="java.util.Map">
+		UPDATE risk_project
+		<set>
+			<if test="projectName !=null and projectName != ''">
+				PROJECT_NAME = #{projectName},
+			</if>
+			<if test="projVersion !=null and projVersion != ''">
+				PROJ_VERSION = #{projVersion},
+			</if>
+			<if test="riskType !=null and riskType != ''">
+				RISK_TYPE = #{riskType},
+			</if>
+			<if test="orderlies !=null and orderlies != ''">
+				ORDERLIES = #{orderlies},
+			</if>
+			<if test="riskIssues !=null">
+				RISK_ISSUES = #{riskIssues},
+			</if>
+			<if test="riskStatus !=null and riskStatus != ''">
+				RISK_STATUS = #{riskStatus},
+			</if>
+			<if test="isRiskAscend !=null and isRiskAscend != ''">
+				IS_RISK_ASCEND = #{isRiskAscend},
+			</if>
+			<if test="poStatusRisk !=null">
+				PO_STATUS_RISK = #{poStatusRisk},
+			</if>
+		</set>
+		WHERE PROJECT_ID = #{projectId}
+	</update>
+	
+	<!-- 通过PK查询重点/风险项目 -->
+	<select id="getRiskProjectByPK" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		SELECT 
+			r.PROJECT_ID, 
+			r.PROJECT_NAME, 
+			r.PROJ_VERSION, 
+			r.RISK_TYPE,
+			r.ORDERLIES, 
+			r.RISK_ISSUES, 
+			r.RISK_STATUS, 
+			r.IS_RISK_ASCEND,
+			r.PO_STATUS_RISK, 
+			p.PRODUCT, 
+			p.AREA
+		FROM risk_project r, proj_basic_info p
+		WHERE r.PROJECT_ID = p.PROJECT_ID AND r.PROJECT_ID = #{projectId} 
+	</select>
+	
+	<!-- 查询重点/风险项目 -->
+	<select id="getRiskProject" resultType="java.util.Map" parameterType="java.util.HashMap">
+		SELECT 
+			r.PROJECT_ID			AS projectId, 
+			r.PROJECT_NAME			AS projectName, 
+			r.PROJ_VERSION			AS projVersion, 
+			r.RISK_TYPE				AS riskType,
+			r.ORDERLIES				AS orderlies, 
+			r.RISK_ISSUES			AS riskIssues, 
+			r.RISK_STATUS			AS riskStatus, 
+			r.IS_RISK_ASCEND		AS isRiskAscend,
+			r.PO_STATUS_RISK		AS poStatusRisk, 
+			p.PRODUCT				AS product, 
+			p.AREA					AS area, 
+			p.PRODUCT_LINE			AS productLine,
+			s.PLAN_WORK				AS planWork,
+			s.CURR_WORK				AS currWork,
+			s.QUALIY_DESC			AS qualiy,
+			s.SCHEDULE				AS schedule,
+			s.FRS_QUALIY			AS frsQualiy,
+			s.CODE_QUALIY			AS codeQualiy,
+			s.CONTINU_INTEGRATION	AS continueIntegration,
+			s.COMMIT_TEST_QUALIY	AS commitTestQualiy,
+			s.TEST_QUALIY			AS testQualiy,
+			s.PROJECT_ABILITY		AS projectAbility,
+			s.PROCESS_EVALUATE		AS processEvaluate,
+			s.QA_WARN_COUNT			AS qaWarnCount,
+			s.QUALIY_ASSESS			AS qualiyAssess
+		FROM 
+			risk_project r
+		INNER JOIN proj_basic_info p ON r.PROJECT_ID = p.PROJECT_ID 
+		INNER JOIN proj_state s ON r.PROJECT_ID = s.PROJECT_ID 
+		WHERE 1 = 1
+		<if test="ePmName != null and ePmName !=''">
+			AND p.EPM_NAME = #{ePmName}
+		</if>
+		<if test="eQaName != null and eQaName !=''">
+			AND p.EQA_NAME = #{eQaName}
+		</if>
+		<if test="area != null and area != ''">
+			AND p.area = #{area}
+		</if>
+		<if test="productLine != null and productLine != ''">
+			AND p.PRODUCT_LINE = #{productLine} 
+		</if>
+		<if test="projectName">
+			AND r.PROJECT_NAME LIKE '%' #{projectName} '%'
+		</if>
+	  	ORDER BY
+  		r.PROJECT_ID DESC
+		<if test="pageRecord != null and pageRecord != ''">
+	  		LIMIT #{beginnum}, #{pageRecord}
+	  	</if>
+	</select>
+
+</mapper>

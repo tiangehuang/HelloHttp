@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.epro.pms.project_basic_info.dao.ProjCorePersonInfoMapper">
+	<resultMap id="BaseResultMap" type="com.epro.pms.project_basic_info.po.ProjCorePersonInfo">
+		<id column="ID" property="id" jdbcType="INTEGER"/>
+		<result column="PROJECT_ID" property="projectId" jdbcType="INTEGER"/>
+		<result column="EPRO_NO" property="eproNo" jdbcType="VARCHAR"/>
+		<result column="NAME" property="name" jdbcType="VARCHAR"/>
+		<result column="PLAN_ROLE" property="planRole" jdbcType="VARCHAR"/>
+		<result column="SEPERATION_LEVEL" property="seperationLevel" jdbcType="INTEGER"/>
+		<result column="IS_SEPERATION" property="isSeperation" jdbcType="INTEGER"/>
+		<result column="DESC" property="desc" jdbcType="VARCHAR"/>
+		<result column="STABILITY_MEASURE" property="stabilityMeasure" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<!-- 删除核心人员信息 -->
+	<delete id="deleteProjCorePersonInfoByPK" parameterType="java.lang.Integer">
+		DELETE FROM 
+			proj_core_person
+		WHERE 
+			PROJECT_ID = #{projectId}
+	</delete>
+	
+	<!-- 更新核心人员信息 -->
+	<update id="updateProjCorePersonInfoByPK" parameterType="java.util.Map">
+		UPDATE proj_core_person
+		<set>
+			<if test="seperationLevel != null">
+				SEPERATION_LEVEL = #{seperationLevel},
+			</if>
+			<if test="isSeperation != null">
+				IS_SEPERATION = #{isSeperation},
+			</if>
+			<if test="desc !=null">
+				`DESC` = #{desc},
+			</if>
+			<if test="stabilityMeasure != null">
+				STABILITY_MEASURE = #{stabilityMeasure},
+			</if>
+		</set>
+		WHERE ID = #{id} 
+	</update>
+	
+	<!-- 通过projetId查询核心人员信息 -->
+	<select id="getProjCorePersonInfoByProjectId" parameterType="java.lang.Integer" resultType="java.util.Map">
+		SELECT 
+			ID					AS id,
+			PROJECT_ID			AS projectId,
+			EPRO_NO				AS eproNo,
+			NAME				AS name,
+			PLAN_ROLE			AS planRole,
+			SEPERATION_LEVEL	AS seperationLevel,
+			IS_SEPERATION		AS isSeperation,
+			`DESC`				AS 'desc',
+			STABILITY_MEASURE	AS stabilityMeasure
+		FROM 
+			proj_core_person
+		WHERE 
+			PROJECT_ID = #{projectId}
+	</select>
+	
+	<!-- 查询所有核心人员信息 -->
+	<select id="getProjCorePersonInfo" resultMap="BaseResultMap">
+		SELECT *
+		FROM proj_core_person
+	</select>
+	
+</mapper>

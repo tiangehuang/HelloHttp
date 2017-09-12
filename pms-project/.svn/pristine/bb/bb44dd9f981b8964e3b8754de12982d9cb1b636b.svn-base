@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.epro.pms.project_basic_info.dao.ProjectStateInfoMapper">
+	<resultMap id="BaseResultMap" type="com.epro.pms.project_basic_info.po.ProjectStateInfo">
+		<id column="PROJECT_ID" property="projectId" jdbcType="INTEGER"/>
+		<result column="PLAN_WORK" property="planWork" jdbcType="INTEGER"/>
+		<result column="CURR_WORK" property="currWork" jdbcType="INTEGER"/>
+		<result column="CURR_STAGE" property="currStage" jdbcType="VARCHAR"/>
+		<result column="QUALIY_DESC" property="qualiyDesc" jdbcType="INTEGER"/>
+		<result column="SCHEDULE" property="schedule" jdbcType="INTEGER"/>
+		<result column="FRS_QUALIY" property="frsQualiy" jdbcType="INTEGER"/>
+		<result column="CODE_QUALIY" property="codeQualiy" jdbcType="INTEGER"/>
+		<result column="CONTINU_INTEGRATION" property="continuIntegration" jdbcType="INTEGER"/>
+		<result column="COMMIT_TEST_QUALIY" property="commitTestQualiy" jdbcType="INTEGER"/>
+		<result column="TEST_QUALIY" property="testQualiy" jdbcType="INTEGER"/>
+		<result column="PROJECT_ABILITY" property="projectAbility" jdbcType="INTEGER"/>
+		<result column="PROCESS_EVALUATE" property="processEvaluate" jdbcType="INTEGER"/>
+		<result column="QA_WARN_COUNT" property="qaWarnCount" jdbcType="INTEGER"/>
+		<result column="QUALIY_ASSESS" property="qualiyAssess" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<!-- 添加项目状态信息 -->
+	<insert id="insert" parameterType="java.util.HashMap">
+		INSERT INTO proj_state
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="projectId != null">
+				PROJECT_ID, 
+			</if>
+			<if test="planWork != null and planWork != ''">
+				PLAN_WORK, 
+			</if>
+			<if test="currWork != null and currWork != ''">
+				CURR_WORK, 
+			</if>
+			<if test="currStage != null">
+				CURR_STAGE,
+			</if>
+			<if test="qualiyDesc != null and qualiyDesc != ''">
+				QUALIY_DESC, 
+			</if>
+			<if test="schedule != null and schedule != ''">
+				SCHEDULE, 
+			</if>
+			<if test="frsQualiy != null and frsQualiy != ''">
+				FRS_QUALIY, 
+			</if>
+			<if test="codeQualiy != null and codeQualiy != ''">
+				CODE_QUALIY,
+			</if>
+			<if test="continuIntegration != null and continuIntegration != ''">
+				CONTINU_INTEGRATION, 
+			</if>
+			<if test="commitTestQualiy != null and commitTestQualiy != ''">
+				COMMIT_TEST_QUALIY, 
+			</if>
+			<if test="testQualiy != null and testQualiy != ''">
+				TEST_QUALIY,
+			</if>
+			<if test="projectAbility != null and projectAbility != ''">
+				PROJECT_ABILITY, 
+			</if>
+			<if test="processEvaluate != null and processEvaluate != ''">
+				PROCESS_EVALUATE, 
+			</if>
+			<if test="qaWarnCount != null and qaWarnCount != ''">
+				QA_WARN_COUNT, 
+			</if>
+			<if test="qualiyAssess != null">
+				QUALIY_ASSESS,
+			</if>
+		</trim>
+		VALUES
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="projectId != null">
+				#{projectId}, 
+			</if>
+			<if test="planWork != null and planWork != ''">
+				#{planWork}, 
+			</if>
+			<if test="currWork != null and currWork != ''">
+				#{currWork}, 
+			</if>
+			<if test="currStage != null">
+				#{currStage},
+			</if>
+			<if test="qualiyDesc != null and qualiyDesc != ''">
+				#{qualiyDesc}, 
+			</if>
+			<if test="schedule != null and schedule != ''">
+				#{schedule}, 
+			</if>
+			<if test="frsQualiy != null and frsQualiy != ''">
+				#{frsQualiy}, 
+			</if>
+			<if test="codeQualiy != null and codeQualiy != ''">
+				#{codeQualiy},
+			</if>
+			<if test="continuIntegration != null and continuIntegration != ''">
+				#{continuIntegration}, 
+			</if>
+			<if test="commitTestQualiy != null and commitTestQualiy != ''">
+				#{commitTestQualiy}, 
+			</if>
+			<if test="testQualiy != null and testQualiy != ''">
+				#{testQualiy},
+			</if>
+			<if test="projectAbility != null and projectAbility != ''">
+				#{projectAbility}, 
+			</if>
+			<if test="processEvaluate != null and processEvaluate != ''">
+				#{processEvaluate}, 
+			</if>
+			<if test="qaWarnCount != null and qaWarnCount != ''">
+				#{qaWarnCount}, 
+			</if>
+			<if test="qualiyAssess != null">
+				#{qualiyAssess}
+			</if>
+		</trim>
+	</insert>
+	
+	<!-- 删除项目状态信息 -->
+	<delete id="deleteProjectStateInfoByPK" parameterType="java.lang.Integer">
+		DELETE FROM proj_state
+		WHERE PROJECT_ID = #{projectId}
+	</delete>
+	
+	<!-- 更新项目状态信息 -->
+	<update id="updateProjectStateInfoByPK" parameterType="com.epro.pms.project_basic_info.po.ProjectStateInfo">
+		UPDATE proj_state
+		<set>
+			<if test="planWork != null and planWork != ''">
+				PLAN_WORK = #{planWork}
+			</if>
+			<if test="currWork != null and currWork != ''">
+				CURR_WORK = #{currWork}
+			</if>
+			<if test="currStage != null">
+				CURR_STAGE = #{currStage}
+			</if>
+			<if test="qualiyDesc != null and qualiyDesc != ''">
+				QUALIY_DESC = #{qualiyDesc}
+			</if>
+			<if test="schedule != null and schedule != ''">
+				SCHEDULE = #{schedule}
+			</if>
+			<if test="frsQualiy != null and frsQualiy != ''">
+				FRS_QUALIY = #{frsQualiy}
+			</if>
+			<if test="codeQualiy != null and codeQualiy != ''">
+				CODE_QUALIY = #{codeQualiy}
+			</if>
+			<if test="continuIntegration != null and continuIntegration != ''">
+				CONTINU_INTEGRATION = #{continuIntegration}
+			</if>
+			<if test="commitTestQualiy != null and commitTestQualiy != ''">
+				COMMIT_TEST_QUALIY = #{commitTestQualiy}
+			</if>
+			<if test="testQualiy != null and testQualiy != ''">
+				TEST_QUALIY = #{testQualiy}
+			</if>
+			<if test="projectAbility != null and projectAbility != ''">
+				PROJECT_ABILITY = #{projectAbility}
+			</if>
+			<if test="processEvaluate != null and processEvaluate != ''">
+				PROCESS_EVALUATE = #{processEvaluate}
+			</if>
+			<if test="qaWarnCount != null and qaWarnCount != ''">
+				QA_WARN_COUNT = #{qaWarnCount}
+			</if>
+			<if test="qualiyAssess != null">
+				QUALIY_ASSESS = #{qualiyAssess}
+			</if>
+		</set>
+		WHERE PROJECT_ID = #{projectId}
+	</update>
+	
+	<!-- 通过主键获取项目状态信息 -->
+	<select id="getProjectStateInfoByPK" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		SELECT *
+		FROM proj_state
+		WHERE PROJECT_ID = #{projectId}
+	</select>
+	
+	<!-- 获取所有项目状态信息 -->
+	<select id="getProjectStateInfo" resultMap="BaseResultMap">
+		SELECT *
+		FROM proj_state
+	</select>
+
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.epro.pms.project_basic_info.dao.KeyRolesMatchBaselineMapper" >
+  <resultMap id="BaseResultMap" type="com.epro.pms.project_basic_info.po.KeyRolesMatchBaselineInfo" >
+     <id column="EMPLOYEE_ID" property="employeeId" jdbcType="INTEGER" />
+     <result column="tseCount" property="tseCount" jdbcType="INTEGER" />
+     <result column="pmCount" property="pmCount" jdbcType="INTEGER" />
+     <result column="plCount" property="plCount" jdbcType="INTEGER" />
+     <result column="tcCount" property="tcCount" jdbcType="INTEGER" />
+     <result column="seCount" property="seCount" jdbcType="INTEGER" />
+     <result column="mdeCount" property="mdeCount" jdbcType="INTEGER" />
+     <result column="count" property="count" jdbcType="INTEGER" />
+    <result column="Name" property="name" jdbcType="VARCHAR" />
+    <result column="AREA" property="area" jdbcType="VARCHAR" />
+    <result column="PRODUCT_LINE" property="productLine" jdbcType="VARCHAR" />
+    <result column="IS_ANSWER_PASSED" property="isAnswerPassed" jdbcType="INTEGER" />
+    <result column="IS_CENTRAL_PERSON" property="isCentralPerson" jdbcType="INTEGER" />
+    <result column="IS_KEY_ROLE" property="isKeyRole" jdbcType="INTEGER" />
+    <result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR" />
+    <result column="CURRENT_ROLE" property="currentRole" jdbcType="VARCHAR" />
+    <result column="PLAN_ROLE" property="planRole" jdbcType="VARCHAR" />
+    <result column="HW_PM" property="hwPm" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="INTEGER" />
+  </resultMap>
+  	<select id="findProductLineCount" parameterType="com.epro.pms.project_basic_info.po.KeyRolesMatchBaselineInfo">
+  		SELECT COUNT(*)
+		FROM
+		  employee_info emp
+		 WHERE 1=1
+		 <if test="productLine !=null">
+			AND PRODUCT_LINE = #{productLine}
+		</if>
+		GROUP BY PRODUCT_LINE 
+  	</select>
+
+	<select id="findKeyRoleMatchBaseline" parameterType="com.epro.pms.project_basic_info.po.KeyRolesMatchBaselineInfo" resultMap="BaseResultMap">
+		SELECT 
+		  pro.PROJECT_ID,
+		  pro.AREA,
+		  pro.PRODUCT_LINE,
+		  sta.IS_ANSWER_PASSED,
+		  sta.CURRENT_ROLE,
+		   COUNT(*) AS COUNT,
+		   COUNT(
+		    CASE
+		      WHEN sta.IS_KEY_ROLE = '1' 
+		      THEN sta.IS_KEY_ROLE 
+		    END
+		  ) AS IS_KEY_ROLE,
+		  COUNT(
+		    CASE
+		      WHEN sta.CURRENT_ROLE = '1' 
+		      THEN sta.CURRENT_ROLE 
+		    END
+		  ) AS tseCount,
+		  COUNT(
+		    CASE
+		      WHEN sta.CURRENT_ROLE = '2' 
+		      THEN sta.CURRENT_ROLE 
+		    END
+		  ) AS pmCount,
+		  COUNT(
+		    CASE
+		      WHEN sta.CURRENT_ROLE = '3' 
+		      THEN sta.CURRENT_ROLE 
+		    END
+		  ) AS plCount,
+		  COUNT(
+		    CASE
+		      WHEN sta.CURRENT_ROLE = '4' 
+		      THEN sta.CURRENT_ROLE 
+		    END
+		  ) AS tcCount,
+		  COUNT(
+		    CASE
+		      WHEN sta.CURRENT_ROLE = '5' 
+		      THEN sta.CURRENT_ROLE 
+		    END
+		  ) AS seCount,
+		  COUNT(
+		    CASE
+		      WHEN sta.CURRENT_ROLE = '6' 
+		      THEN sta.CURRENT_ROLE 
+		    END
+		  ) AS mdeCount 
+		FROM
+		  proj_basic_info pro,
+		  proj_staff_info sta 
+		  WHERE sta.PROJECT_ID = pro.PROJECT_ID
+			<if test="area !=null and area !='' ">
+				AND AREA = #{area} 
+			</if>
+			<if test="productLine !=null and productLine !='' ">
+				AND PRODUCT_LINE = #{productLine}
+			</if>
+		GROUP BY pro.PRODUCT_LINE
+		
+	</select>
+  
+</mapper>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.epro.pms.project_basic_info.dao.FpProjectMapper">
+	<resultMap id="BaseResultMap" type="com.epro.pms.project_basic_info.po.FpProject">
+		<id column="PROJECT_ID" property="projectId" jdbcType="INTEGER"/>
+		<result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR"/>
+		<result column="TRANSITION_START_TIME" property="transitionStartTime" jdbcType="DATE"/>
+		<result column="TRANSITION_END_TIME" property="transitionEndTime" jdbcType="DATE"/>
+		<result column="B_AMOUNT" property="bAmount" jdbcType="INTEGER"/>
+		<result column="PLAL_PROGRESS" property="plalProgress" jdbcType="VARCHAR"/>
+		<result column="CURR_PROGRESS" property="currProgress" jdbcType="VARCHAR"/>
+		<result column="PLAL_COST" property="plalCost" jdbcType="VARCHAR"/>
+		<result column="CURR_COST" property="currCost" jdbcType="VARCHAR"/>
+		<result column="RISK_ISSUES" property="riskIssues" jdbcType="VARCHAR"/>
+		<result column="PO_STATUS_RISK" property="poStatusRisk" jdbcType="VARCHAR"/>
+		<!-- 项目基本信息的字段 -->
+		<result column="AREA" property="area" jdbcType="VARCHAR"/>
+		<result column="PRODUCT_LINE" property="productLine" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<!-- 增加fp项目信息 -->
+	<insert id="insert" parameterType="java.util.HashMap">
+		INSERT INTO 
+		fp_project(
+			PROJECT_ID, PROJECT_NAME, TRANSITION_START_TIME,
+			TRANSITION_END_TIME, B_AMOUNT, PLAL_PROGRESS,
+			CURR_PROGRESS, PLAL_COST, CURR_COST,
+			RISK_ISSUES, PO_STATUS_RISK
+		)
+		VALUES(
+			#{projectId}, #{projectName}, #{transitionStartTime},
+			#{transitionEndTime}, #{bAmount}, #{plalProgress},
+			#{currProgress}, #{plalCost}, #{currCost},
+			#{riskIssues}, #{poStatusRisk}
+		)
+	</insert>
+	
+	<!-- 删除FP项目信息 -->
+	<delete id="deleteFpProjectByPK" parameterType="java.lang.Integer">
+		DELETE FROM fp_project
+		WHERE PROJECT_ID = #{projectId}
+	</delete>
+	
+	<!-- 更新FP项目信息 -->
+	<update id="updateFpProjectByPK" parameterType="java.util.Map">
+		UPDATE fp_project
+		<set>
+			<if test="projectName != null and projectName != ''">
+				PROJECT_NAME = #{projectName},
+			</if>
+			<if test="transitionStartTime != null">
+				TRANSITION_START_TIME = #{transitionStartTime},
+			</if>
+			<if test="transitionEndTime != null">
+				TRANSITION_END_TIME = #{transitionEndTime},
+			</if>
+			<if test="bAmount != null and bAmount != ''">
+				B_AMOUNT = #{bAmount},
+			</if>
+			<if test="plalProgress != null and plalProgress != ''">
+				PLAL_PROGRESS = #{plalProgress},
+			</if>
+			<if test="currProgress != null and currProgress != ''">
+				CURR_PROGRESS = #{currProgress},
+			</if>
+			<if test="plalCost != null and plalCost != ''">
+				PLAL_COST = #{plalCost},
+			</if>
+			<if test="currCost != null and currCost != ''">
+				CURR_COST = #{currCost},
+			</if>
+			<if test="riskIssues != null">
+				RISK_ISSUES = #{riskIssues},
+			</if>
+			<if test="poStatusRisk != null">
+				PO_STATUS_RISK = #{poStatusRisk},
+			</if>
+		</set>
+		WHERE PROJECT_ID = #{projectId}
+	</update>
+	
+	<!-- 获取FP项目信息 -->
+	<select id="getFpProjectByPK" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		SELECT * 
+		FROM fp_project
+		WHERE PROJECT_ID = #{projectId}
+	</select>
+	
+	<!-- 获取所有的FP项目信息 -->
+	<select id="getFpProject" parameterType="java.util.HashMap" resultType="java.util.Map">
+		SELECT 
+			f.PROJECT_ID			AS projectId,
+			f.PROJECT_NAME			AS projectName,
+			f.TRANSITION_START_TIME	AS transitionStartTime,
+			f.TRANSITION_END_TIME	AS transitionEndTime,
+			f.B_AMOUNT				AS bAmount,
+			f.PLAL_PROGRESS			AS plalProgress,
+			f.CURR_PROGRESS			AS currProgress,
+			f.PLAL_COST				AS plalCost,
+			f.CURR_COST				AS currCost,
+			f.RISK_ISSUES			AS riskIssues,
+			f.PO_STATUS_RISK		AS poStatusRisk,
+			s.PLAN_WORK				AS planWork,
+			s.CURR_WORK				AS currWork,
+			s.QUALIY_DESC			AS qualiy,
+			s.SCHEDULE				AS schedule,
+			s.FRS_QUALIY			AS frsQualiy,
+			s.CODE_QUALIY			AS codeQualiy,
+			s.CONTINU_INTEGRATION	AS continueIntegration,
+			s.COMMIT_TEST_QUALIY	AS commitTestQualiy,
+			s.TEST_QUALIY			AS testQualiy,
+			s.PROJECT_ABILITY		AS projectAbility,
+			s.PROCESS_EVALUATE		AS processEvaluate,
+			s.QA_WARN_COUNT			AS qaWarnCount,
+			s.QUALIY_ASSESS			AS qualiyAssess,
+			p.AREA					AS area,
+			p.PRODUCT_LINE			AS productLine,
+			p.CONTRACT_ID			AS contractId
+		FROM fp_project f
+		INNER JOIN proj_basic_info p ON f.PROJECT_ID = p.PROJECT_ID
+		INNER JOIN proj_state s ON f.PROJECT_ID = s.PROJECT_ID 
+		WHERE 1 = 1
+		<if test="ePmName != null and ePmName !=''">
+			AND p.EPM_NAME = #{ePmName}
+		</if>
+		<if test="eQaName != null and eQaName !=''">
+			AND p.EQA_NAME = #{eQaName}
+		</if>
+		<if test="area != null and area != ''">
+			AND p.AREA = #{area}
+		</if>
+		<if test="productLine != null and productLine != ''">
+			AND p.PRODUCT_LINE = #{productLine}
+		</if>
+		<if test="projectName != null and projectName != ''">
+			AND f.PROJECT_NAME LIKE '%' #{projectName} '%'
+		</if>
+  		ORDER BY
+  		f.PROJECT_ID DESC
+		<if test="pageRecord != null and pageRecord != ''">
+  			LIMIT #{beginnum}, #{pageRecord}
+  		</if>
+	</select>
+	
+	<!-- 获取合同的项目开始和结束时间，计算预计进度用  -->
+	<select id="getContractInfo" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT
+			P_START_TIME	AS startTime,
+			P_END_TIME		AS endTime
+		FROM 
+			proj_contract
+		WHERE
+			CONTRACT_ID = #{contractId}
+	</select>
+	
+	<select id="getFpProjectState" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			CURR_WORK AS currWork
+		FROM
+			proj_state
+		WHERE
+			PROJECT_ID = #{projectId}
+	</select>
+	
+	<select id="getWorkloadByProjectId" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT 
+			PROJECT_ID			AS projectId,
+			PROJECT_NAME		AS projectName,
+			SUM(W_ALL_WORKLOAD)	AS allworkload
+		FROM
+			weekly_report
+		WHERE
+			PROJECT_ID = #{projectId}
+	</select>
+
+</mapper>
+
